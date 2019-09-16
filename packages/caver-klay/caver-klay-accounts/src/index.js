@@ -52,8 +52,10 @@ var isNot = function(value) {
 
 function coverInitialTxValue(tx) {
   if (typeof tx !== 'object') throw ('Invalid transaction')
-  tx.to = tx.to || '0x'
-  tx.data = tx.data || '0x'
+  if (!tx.type || tx.type === 'LEGACY') {
+    tx.to = tx.to || '0x'
+    tx.data = tx.data || '0x'  
+  }
   tx.chainId = utils.numberToHex(tx.chainId)
   return tx
 }
@@ -144,98 +146,140 @@ Accounts.prototype.privateKeyToAccount = function privateKeyToAccount(privateKey
   return this._addAccountFunctions(account)
 }
 
-Accounts.prototype.signTransaction = function signTransaction(tx, privateKey, callback) {
-    var _this = this,
-        error = false,
-        result
 
-    callback = callback || function () {}
+Accounts.prototype.signTransaction = function signTransaction() {
+  if (arguments.length === 0 || arguments.length > 3) throw new Error('Inavlid parameter for signTrasnaction(tx, privateKey, callback) or signTrasnaction(tx, callback)')
 
+  // privateKey and callback are optional parameter
+  // "arguments.length === 2" means that user sent parameter privateKey or callback
+  let tx = arguments[0], privateKey, callback
+  if (arguments.length === 2) {
+    if (_.isFunction(arguments[1])) {
+      callback = arguments[1]
+    } else {
+      privateKey = arguments[1]
+    }
+  } else if (arguments.length === 3) {
+    privateKey = arguments[1]
+    callback = arguments[2]
+  }
+
+  const getPrivateKey = (address) => {
+    const account = this.wallet[address]
+    if (account === undefined) throw new Error(`Failed to find key matched with ${address} from wallet.`)
+    
+    return account.privateKey
+  }
+  
+  if (privateKey === undefined) privateKey = getPrivateKey(tx.from || tx.feePayer)
+
+  let privateKeyArray = _.isArray(privateKey) ? privateKey : [privateKey]
+
+  return this._signTransaction(tx, privateKeyArray, callback)
+}
+
+Accounts.prototype._signTransaction = function _signTransaction(tx, privateKeys, callback) {
+	var _this = this,
+    error = false,
+    isLegacy = false,
+    result,
+
+  callback = callback || function () {}
+  
+	if (!tx) {
+    error = new Error('No transaction object given!')
+	} else if (!tx.senderRawTransaction){
+    error = helpers.validateFunction.validateParams(tx)
+  }
+
+  if (error) {
+    callback(error);
+    return Promise.reject(error);
+  }
+
+  if (tx.type === undefined || tx.type === 'LEGACY') isLegacy = true
+
+  if (isLegacy && privateKeys.length > 1) throw new Error('Legacy transaction cannot signed with multiple keys')
+
+  for (let privateKey of privateKeys) {
     const parsed = utils.parsePrivateKey(privateKey)
     privateKey = parsed.privateKey
-
+  
     if (!utils.isValidPrivateKey(privateKey)) throw new Error('Invalid private key')
-    privateKey = privateKey.startsWith('0x') ? privateKey : '0x' + privateKey
+    privateKey = utils.addHexPrefix(privateKey)
+  }
 
-    if (!tx) {
-      error = new Error('No transaction object given!')
+	function signed(tx) {
+    try {
+      // Guarantee all property in transaction is hex.
+      tx = helpers.formatters.inputCallFormatter(tx)
 
-      callback(error)
-      return Promise.reject(error)
-    }
+      const transaction = coverInitialTxValue(tx)
 
-    function signed(tx) {
+      const rlpEncoded = encodeRLPByTxType(transaction)
 
-      if (!tx.senderRawTransaction) {
-        error = helpers.validateFunction.validateParams(tx)
-      }
-      if (error) {
-        callback(error);
-        return Promise.reject(error);
-      }
+      const messageHash = Hash.keccak256(rlpEncoded)
 
-      try {
-        // Guarantee all property in transaction is hex.
-        tx = helpers.formatters.inputCallFormatter(tx)
+      let signatrues = []
 
-        const transaction = coverInitialTxValue(tx)
-
-        const rlpEncoded = encodeRLPByTxType(transaction)
-
-        const messageHash = Hash.keccak256(rlpEncoded)
-
+      for(const privateKey of privateKeys) {
         const signature = Account.makeSigner(Nat.toNumber(transaction.chainId || "0x1") * 2 + 35)(messageHash, privateKey)
         const [v, r, s] = Account.decodeSignature(signature).map(sig => utils.makeEven(utils.trimLeadingZero(sig)))
-
-        const rawTransaction = makeRawTransaction(rlpEncoded, [v, r, s], transaction)
-
-        result = {
-            messageHash: messageHash,
-            v: v,
-            r: r,
-            s: s,
-            rawTransaction: rawTransaction,
-            txHash: Hash.keccak256(rawTransaction),
-            senderTxHash: getSenderTxHash(rawTransaction),
-        }
-
-      } catch(e) {
-        callback(e)
-        return Promise.reject(e)
+        signatrues.push([v, r, s])
       }
 
-      callback(null, result)
-      return result
+      if (isLegacy) signatrues = signatrues[0]
+
+      const rawTransaction = makeRawTransaction(rlpEncoded, signatrues, transaction)
+
+      result = {
+        messageHash: messageHash,
+        v: isLegacy? signatrues[0] : signatrues[0][0],
+        r: isLegacy? signatrues[1] : signatrues[0][1],
+        s: isLegacy? signatrues[2] : signatrues[0][2],
+        signature: signatrues,
+        rawTransaction: rawTransaction,
+        txHash: Hash.keccak256(rawTransaction),
+        senderTxHash: getSenderTxHash(rawTransaction),
+      }
+
+    } catch(e) {
+      callback(e)
+      return Promise.reject(e)
     }
 
-    if (tx.nonce !== undefined && tx.chainId !== undefined && tx.gasPrice !== undefined) {
-        return Promise.resolve(signed(tx));
-    }
+    callback(null, result)
+    return result
+	}
 
-    // When the feePayer signs a transaction, required information is only chainId.
-    if (tx.senderRawTransaction !== undefined) {
-      return Promise.all([
-          isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
-      ]).then(function (args) {
-          if (isNot(args[0])) {
-              throw new Error('"chainId" couldn\'t be fetched: '+ JSON.stringify(args));
-          }
-          return signed(_.extend(tx, {chainId: args[0]}));
-      });
-    }
+	if (tx.nonce !== undefined && tx.chainId !== undefined && tx.gasPrice !== undefined) {
+		return Promise.resolve(signed(tx));
+	}
 
-    // Otherwise, get the missing info from the Klaytn Node
+	// When the feePayer signs a transaction, required information is only chainId.
+	if (tx.senderRawTransaction !== undefined) {
     return Promise.all([
-        isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
-        isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
-        isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from || _this.privateKeyToAccount(privateKey).address) : tx.nonce 
+      isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
     ]).then(function (args) {
-        if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
-            throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: '+ JSON.stringify(args));
-        }
-        return signed(_.extend(tx, {chainId: args[0], gasPrice: args[1], nonce: args[2]}));
+      if (isNot(args[0])) {
+        throw new Error('"chainId" couldn\'t be fetched: '+ JSON.stringify(args));
+      }
+      return signed(_.extend(tx, {chainId: args[0]}));
     });
-};
+	}
+
+	// Otherwise, get the missing info from the Klaytn Node
+	return Promise.all([
+		isNot(tx.chainId) ? _this._klaytnCall.getChainId() : tx.chainId,
+		isNot(tx.gasPrice) ? _this._klaytnCall.getGasPrice() : tx.gasPrice,
+		isNot(tx.nonce) ? _this._klaytnCall.getTransactionCount(tx.from) : tx.nonce 
+	]).then(function (args) {
+		if (isNot(args[0]) || isNot(args[1]) || isNot(args[2])) {
+			throw new Error('One of the values "chainId", "gasPrice", or "nonce" couldn\'t be fetched: '+ JSON.stringify(args));
+		}
+		return signed(_.extend(tx, {chainId: args[0], gasPrice: args[1], nonce: args[2]}));
+	});
+}
 
 Accounts.prototype.signTransactionWithSignature = function signTransactionWithSignature(tx, callback) {
     var _this = this,
