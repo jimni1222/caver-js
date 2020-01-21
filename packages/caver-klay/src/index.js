@@ -34,7 +34,8 @@ const utils = require('../../caver-utils')
 const Net = require('../../caver-net')
 
 const Personal = require('../caver-klay-personal')
-const BaseContract = require('../caver-klay-contract')
+const Contract = require('../caver-klay-contract')
+const ERC20 = require('../caver-klay-erc20')
 const Accounts = require('../caver-klay-accounts')
 const abi = require('../caver-klay-abi')
 const getNetworkType = require('./getNetworkType.js')
@@ -123,29 +124,34 @@ const Klay = function Klay(...args) {
     this.personal = new Personal(this.currentProvider)
     this.personal.defaultAccount = this.defaultAccount
 
-    // create a proxy Contract type for this instance, as a Contract's provider
-    // is stored as a class member rather than an instance variable. If we do
-    // not create this proxy type, changing the provider in one instance of
-    // caver-klay would subsequently change the provider for _all_ contract
-    // instances!
-    const Contract = function Contract() {
-        BaseContract.apply(this, arguments)
-    }
+    // // create a proxy Contract type for this instance, as a Contract's provider
+    // // is stored as a class member rather than an instance variable. If we do
+    // // not create this proxy type, changing the provider in one instance of
+    // // caver-klay would subsequently change the provider for _all_ contract
+    // // instances!
+    // const Contract = function Contract() {
+    //     BaseContract.apply(this, arguments)
+    // }
 
-    Contract.setProvider = function() {
-        BaseContract.setProvider.apply(this, arguments)
-    }
+    // Contract.setProvider = function() {
+    //     BaseContract.setProvider.apply(this, arguments)
+    // }
 
-    // make our proxy Contract inherit from caver-klay-contract so that it has all
-    // the right functionality and so that instanceof and friends work properly
-    Contract.prototype = Object.create(BaseContract.prototype)
-    Contract.prototype.constructor = Contract
+    // // make our proxy Contract inherit from caver-klay-contract so that it has all
+    // // the right functionality and so that instanceof and friends work properly
+    // Contract.prototype = Object.create(BaseContract.prototype)
+    // Contract.prototype.constructor = Contract
 
     // add contract
     this.Contract = Contract
     this.Contract.defaultAccount = this.defaultAccount
     this.Contract.defaultBlock = this.defaultBlock
     this.Contract.setProvider(this.currentProvider, this.accounts)
+
+    this.ERC20 = ERC20
+    this.ERC20.defaultAccount = this.defaultAccount
+    this.ERC20.defaultBlock = this.defaultBlock
+    this.ERC20.setProvider(this.currentProvider, this.accounts)
 
     // add IBAN
     this.Iban = utils.Iban
