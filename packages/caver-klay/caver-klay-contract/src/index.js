@@ -270,7 +270,6 @@ const Contract = function Contract(jsonInterface, address, options) {
 }
 
 Contract.setProvider = function(provider, accounts) {
-    // Contract.currentProvider = provider;
     core.packageInit(this, [provider])
 
     this._klayAccounts = accounts

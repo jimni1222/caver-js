@@ -1,14 +1,14 @@
 const Caver = require('./index')
 
-const caver = new Caver('http://13.125.237.78:8551/')
+const caver = new Caver('http://13.209.76.202:8551/')
 
-const cn = caver.klay.accounts.wallet.add('06dc654cbce146804b31ea68a9c9988c9bf333027a115aecef02174ca18c935a')
-const cn2 = caver.klay.accounts.wallet.add('ad2ac18efa9e8cd6424855b5406db4d9323c06f8e113f3cf9d80568e2022ab09')
+const cn = caver.klay.accounts.wallet.add('63d15a633c812d2330cab938a52269d64dfb0afae96f0addb5ddfaab6ec4400f')
+const cn2 = caver.klay.accounts.wallet.add('eed5677645f1b0d3d4a845c4d4248eb562f82198daf8727b179e1459c8a76906')
 const testAccount = caver.klay.accounts.wallet.add('0x25460e9158770c449c27f6fc056a10a7d73227d913f9837be5e0fe0b6760dd40')
 
-// test()
+test()
 async function test() {
-    const erc20 = new caver.klay.ERC20()
+    const erc20 = new caver.klay.ERC20('ERC20')
 
     const tokenInfo = {
         name: 'Jasmine',
@@ -17,8 +17,10 @@ async function test() {
         initialSupply: 1000000000000000,
     }
 
-    const deployed = await erc20.deploy(tokenInfo, cn.address)
+	const deployed = await erc20.deploy(tokenInfo, cn.address)
+	console.log(`deployed.address: ${deployed.options.address}`)
 
+	// const deployed = new caver.klay.ERC20('0xA83413E008Ae15f8006DA0Bf50C062668b0f1cb6')
     const name = await deployed.name()
     const symbol = await deployed.symbol()
     const decimals = await deployed.decimals()
@@ -64,7 +66,7 @@ async function testMintable() {
     const totalSupply = await deployed.totalSupply()
     console.log(`Original Total supply : ${totalSupply}`)
 
-    const minting = await deployed.mint(cn.address, 1000000000000000)
+    const minting = await deployed.mint(cn.address, cn.address, 1000000000000000)
     console.log(minting)
 
     const added = await deployed.addMinter(cn.address, cn2.address)
@@ -191,18 +193,20 @@ async function testPausable() {
     console.log(`${cn2.address} is pauser?? ${isPauser2}`)
 }
 
-testCapped()
+// testCapped()
 async function testCapped() {
-    const erc20 = new caver.klay.ERC20()
+    const deployed = await caver.klay.ERC20Capped.deploy(
+        {
+            name: 'Jasmine',
+            symbol: 'JAS',
+            decimal: 18,
+            initialSupply: 1000000000000000,
+        },
+        cn.address,
+        2000000000000000
+    )
 
-    const tokenInfo = {
-        name: 'Jasmine',
-        symbol: 'JAS',
-        decimal: 18,
-        initialSupply: 1000000000000000,
-    }
-
-    const deployed = await erc20.deployCapped(tokenInfo, cn.address, 2000000000000000)
+    console.log(`deployed.type: ${deployed.type}`)
 
     const name = await deployed.name()
     const symbol = await deployed.symbol()
@@ -218,11 +222,70 @@ async function testCapped() {
     const cap = await deployed.cap()
     console.log(`cap : ${cap}`)
 
-    const minting = await deployed.mint(cn.address, 600000000000000)
+    const minting = await deployed.mint(cn.address, cn.address, 600000000000000)
     console.log(minting)
 
     console.log(`After minting Total supply : ${await deployed.totalSupply()}`)
 
-    const minting2 = await deployed.mint(cn.address, 600000000000000)
+    const minting2 = await deployed.mint(cn.address, cn.address, 600000000000000)
     console.log(minting2)
+}
+
+// testMintableClass()
+async function testMintableClass() {
+    // const erc20 = new caver.klay.ERC20Mintable.deploy(tokenInfo, cn.address)
+
+    const tokenInfo = {
+        name: 'Jasmine',
+        symbol: 'JAS',
+        decimal: 18,
+        initialSupply: 1000000000000000,
+    }
+
+    const deployed = await caver.klay.ERC20Mintable.deploy(tokenInfo, cn.address)
+    console.log(deployed)
+
+    const name = await deployed.name()
+    const symbol = await deployed.symbol()
+    const decimals = await deployed.decimals()
+    console.log(`tokenName : ${name} / symbol: ${symbol} / decimal: ${decimals}`)
+
+    const totalSupply = await deployed.totalSupply()
+    console.log(`Original Total supply : ${totalSupply}`)
+
+    const minting = await deployed.mint(cn.address, cn.address, 1000000000000000)
+    console.log(minting)
+
+    const added = await deployed.addMinter(cn.address, cn2.address)
+    console.log(added)
+
+    const isMinter = await deployed.isMinter(cn2.address)
+    console.log(`${cn2.address} is minter?? ${isMinter}`)
+
+    const removed = await deployed.renounceMinter(cn2.address)
+    console.log(removed)
+
+    const isMinter2 = await deployed.isMinter(cn2.address)
+    console.log(`${cn2.address} is minter?? ${isMinter2}`)
+
+    const afterTotalSupply = await deployed.totalSupply()
+    console.log(`After minting Total supply : ${afterTotalSupply}`)
+
+    const balance = await deployed.balanceOf(cn.address)
+    console.log(`${cn.address}'s JAS token balance : ${balance}`)
+
+    const approved = await deployed.approve(cn.address, cn2.address, 10000)
+    console.log(approved)
+
+    const allowance = await deployed.allowance(cn.address, cn2.address)
+    console.log(`allowance: ${allowance}`)
+
+    const transfered = await deployed.transferFrom(cn2.address, cn.address, testAccount.address, 1000)
+    console.log(transfered)
+
+    const afterallowance = await deployed.allowance(cn.address, cn2.address)
+    console.log(`allowance: ${afterallowance}`)
+
+    const afterTransferBalance = await deployed.balanceOf(cn.address)
+    console.log(`${cn.address}'s JAS token balance : ${afterTransferBalance}`)
 }
