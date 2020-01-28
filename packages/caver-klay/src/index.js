@@ -36,10 +36,6 @@ const Net = require('../../caver-net')
 const Personal = require('../caver-klay-personal')
 const BaseContract = require('../caver-klay-contract')
 const ERC20 = require('../caver-klay-kct/erc20')
-const ERC20Mintable = require('../caver-klay-kct/erc20/extends/erc20Mintable')
-const ERC20Burnable = require('../caver-klay-kct/erc20/extends/erc20Burnable')
-const ERC20Pausable = require('../caver-klay-kct/erc20/extends/erc20Pausable')
-const ERC20Capped = require('../caver-klay-kct/erc20/extends/erc20Capped')
 const Accounts = require('../caver-klay-accounts')
 const abi = require('../caver-klay-abi')
 const getNetworkType = require('./getNetworkType.js')
@@ -156,26 +152,6 @@ const Klay = function Klay(...args) {
     this.ERC20.defaultAccount = this.defaultAccount
     this.ERC20.defaultBlock = this.defaultBlock
     this.ERC20.setProvider(this.currentProvider, this.accounts)
-
-    this.ERC20Mintable = ERC20Mintable
-    this.ERC20Mintable.defaultAccount = this.defaultAccount
-    this.ERC20Mintable.defaultBlock = this.defaultBlock
-    this.ERC20Mintable.setProvider(this.currentProvider, this.accounts)
-
-    this.ERC20Burnable = ERC20Burnable
-    this.ERC20Burnable.defaultAccount = this.defaultAccount
-    this.ERC20Burnable.defaultBlock = this.defaultBlock
-    this.ERC20Burnable.setProvider(this.currentProvider, this.accounts)
-
-    this.ERC20Pausable = ERC20Pausable
-    this.ERC20Pausable.defaultAccount = this.defaultAccount
-    this.ERC20Pausable.defaultBlock = this.defaultBlock
-    this.ERC20Pausable.setProvider(this.currentProvider, this.accounts)
-
-    this.ERC20Capped = ERC20Capped
-    this.ERC20Capped.defaultAccount = this.defaultAccount
-    this.ERC20Capped.defaultBlock = this.defaultBlock
-    this.ERC20Capped.setProvider(this.currentProvider, this.accounts)
 
     // add IBAN
     this.Iban = utils.Iban

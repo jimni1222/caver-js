@@ -18,54 +18,45 @@
 
 const _ = require('lodash')
 const Contract = require('../../../caver-klay-contract')
-const { ERC20_TYPES, ERC20_ABI_CODE } = require('./erc20Helper')
+const { ERC20_TYPES, ERC20_ABI_CODE } = require('../../kctHelper')
 const { isAddress } = require('../../../../caver-utils')
 
 class ERC20 extends Contract {
-    // Parameters of ERC20 constructor
-    // 1. without parameters (default ERC20_TYPES.ERC20 type)
-    // 2. with token type (ERC20 extensions are passing specific type)
-    // 3. with contract address (already deployed token contract)
-    // 4. with token type and contract address (already deployed erc20 extension token contract)
-    constructor(tokenType = ERC20_TYPES.ERC20, tokenAddress) {
-        if (!tokenAddress && isAddress(tokenType)) {
-            tokenAddress = tokenType
-            tokenType = ERC20_TYPES.ERC20
+    // TODO: Set default type, and change name of function
+    static deploySimple(tokenInfo, deployer) {
+        const erc20 = new ERC20()
+        return erc20.deploy(tokenInfo, deployer, ERC20_TYPES.MINIMUM)
+    }
+
+    static deployFull(tokenInfo, deployer) {
+        const erc20 = new ERC20()
+        return erc20.deploy(tokenInfo, deployer, ERC20_TYPES.FULL)
+    }
+
+    constructor(tokenAddress) {
+        if (tokenAddress && !isAddress(tokenAddress)) {
+            throw new Error(`Invalid token contract address: The address of token contract is ${tokenAddress}.`)
         }
-
-        super(ERC20_ABI_CODE[tokenType].abi, tokenAddress)
-
-        let type = tokenType
-        Object.defineProperty(this, 'type', {
-            get() {
-                return type
-            },
-            set(t) {
-                this.options.jsonInterface = ERC20_ABI_CODE[t].abi
-                type = t
-            },
-            enumerable: true,
-        })
+        super(ERC20_ABI_CODE[ERC20_TYPES.FULL].abi, tokenAddress)
     }
 
     clone(tokenAddress) {
         return new this.constructor(tokenAddress)
     }
 
-    deploy(tokenInfo, deployer, cap) {
+    deploy(tokenInfo, deployer, type) {
         if (this.options.address) throw new Error(`The token contract is already deployed at ${this.options.address}.`)
 
         validateParamObjForDeploy(tokenInfo)
 
         const { name, symbol, decimal, initialSupply } = tokenInfo
-        const args = cap ? [cap, name, symbol, decimal, initialSupply] : [name, symbol, decimal, initialSupply]
-        const gas = 2500000
+        const gas = 3500000
         const value = 0
 
         return super
             .deploy({
-                data: ERC20_ABI_CODE[this.type].code,
-                arguments: args,
+                data: ERC20_ABI_CODE[type].code,
+                arguments: [name, symbol, decimal, initialSupply],
             })
             .send({ from: deployer, gas, value })
     }
@@ -95,19 +86,77 @@ class ERC20 extends Contract {
         return this.methods.allowance(owner, spender).call()
     }
 
-    approve(owner, spender, amount) {
+    approve(msgSender, spender, amount) {
         const gas = 60000
-        return this.methods.approve(spender, amount).send({ from: owner, gas })
+        return this.methods.approve(spender, amount).send({ from: msgSender, gas })
     }
 
-    transfer(from, to, amount) {
+    transfer(msgSender, to, amount) {
         const gas = 60000
-        return this.methods.transfer(to, amount).send({ from, gas })
+        return this.methods.transfer(to, amount).send({ from: msgSender, gas })
     }
 
     transferFrom(msgSender, from, to, amount) {
         const gas = 70000
         return this.methods.transferFrom(from, to, amount).send({ from: msgSender, gas })
+    }
+
+    // Below methods are for ERC20Mintable (extends)
+    isMinter(account) {
+        return this.methods.isMinter(account).call()
+    }
+
+    mint(msgSender, account, amount) {
+        const gas = 45000
+        return this.methods.mint(account, amount).send({ from: msgSender, gas })
+    }
+
+    addMinter(msgSender, account) {
+        const gas = 50000
+        return this.methods.addMinter(account).send({ from: msgSender, gas })
+    }
+
+    renounceMinter(minterToRemove) {
+        // TODO: gas check !!! gasUsed is 14000???
+        const gas = 30000
+        return this.methods.renounceMinter().send({ from: minterToRemove, gas })
+    }
+
+    // Below methods are for ERC20Burnable (extends)
+    burn(msgSender, amount) {
+        const gas = 70000
+        return this.methods.burn(amount).send({ from: msgSender, gas })
+    }
+
+    burnFrom(msgSender, from, amount) {
+        const gas = 70000
+        return this.methods.burnFrom(from, amount).send({ from: msgSender, gas })
+    }
+
+    // Below methods are for ERC20Pausable (extends)
+    isPauser(account) {
+        return this.methods.isPauser(account).call()
+    }
+
+    addPauser(msgSender, account) {
+        const gas = 50000
+        return this.methods.addPauser(account).send({ from: msgSender, gas })
+    }
+
+    pause(msgSender) {
+        const gas = 45000
+        return this.methods.pause().send({ from: msgSender, gas })
+    }
+
+    unpause(msgSender) {
+        const gas = 30000
+        return this.methods.unpause().send({ from: msgSender, gas })
+    }
+
+    renouncePauser(pauserToRemove) {
+        // TODO: gas check !!! gasUsed is 14000???
+        const gas = 30000
+        return this.methods.renouncePauser().send({ from: pauserToRemove, gas })
     }
 }
 
