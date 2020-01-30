@@ -100,5 +100,6 @@ module.exports = {
         deploy,
         create,
         setProvider,
+        CODE_HASH,
     },
 }

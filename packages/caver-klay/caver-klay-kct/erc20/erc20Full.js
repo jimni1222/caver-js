@@ -22,6 +22,7 @@ const { determineSendParams, ERC20_TYPES, ERC20_ABI_CODE } = require('../kctHelp
 class ERC20Full extends ERC20Simple {
     constructor(tokenAddress) {
         super(tokenAddress, ERC20_ABI_CODE[ERC20_TYPES.FULL].abi)
+        this.type = ERC20_TYPES.FULL
     }
 
     clone(tokenAddress) {
