@@ -35,7 +35,9 @@ const Net = require('../../caver-net')
 
 const Personal = require('../caver-klay-personal')
 const BaseContract = require('../caver-klay-contract')
-const ERC20 = require('../caver-klay-kct/erc20')
+const { ERC20 } = require('../caver-klay-kct/erc20')
+const ERC20Simple = require('../caver-klay-kct/erc20/src/erc20Simple')
+const ERC20Full = require('../caver-klay-kct/erc20/src/erc20Full')
 const Accounts = require('../caver-klay-accounts')
 const abi = require('../caver-klay-abi')
 const getNetworkType = require('./getNetworkType.js')
@@ -149,9 +151,10 @@ const Klay = function Klay(...args) {
     this.Contract.setProvider(this.currentProvider, this.accounts)
 
     this.ERC20 = ERC20
-    this.ERC20.defaultAccount = this.defaultAccount
-    this.ERC20.defaultBlock = this.defaultBlock
     this.ERC20.setProvider(this.currentProvider, this.accounts)
+
+    ERC20Simple.setProvider(this.currentProvider, this.accounts)
+    ERC20Full.setProvider(this.currentProvider, this.accounts)
 
     // add IBAN
     this.Iban = utils.Iban
