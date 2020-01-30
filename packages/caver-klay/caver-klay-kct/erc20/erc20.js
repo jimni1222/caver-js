@@ -17,13 +17,13 @@
 */
 
 const _ = require('lodash')
-const { ERC20_TYPES, ERC20_ABI_CODE } = require('../../kctHelper')
-const { isAddress } = require('../../../../caver-utils')
-const formatters = require('../../../../caver-core-helpers/src/formatters')
-const Method = require('../../../../caver-core-method')
+const { ERC20_TYPES, ERC20_ABI_CODE } = require('../kctHelper')
+const { isAddress } = require('../../../caver-utils/src')
+const formatters = require('../../../caver-core-helpers/src/formatters')
+const Method = require('../../../caver-core-method/src')
 const ERC20Simple = require('./erc20Simple')
 const ERC20Full = require('./erc20Full')
-const core = require('../../../../caver-core')
+const core = require('../../../caver-core/src')
 
 const CODE_HASH = {
     SIMPLE: 'CDq9tSXfwfXczNr64+lGjyJIk+3Soj161pUdTiwEiZw=',

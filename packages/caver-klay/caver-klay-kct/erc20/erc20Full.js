@@ -17,7 +17,7 @@
 */
 
 const ERC20Simple = require('./erc20Simple')
-const { determineSendParams, ERC20_TYPES, ERC20_ABI_CODE } = require('../../kctHelper')
+const { determineSendParams, ERC20_TYPES, ERC20_ABI_CODE } = require('../kctHelper')
 
 class ERC20Full extends ERC20Simple {
     constructor(tokenAddress) {

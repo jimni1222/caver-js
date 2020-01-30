@@ -16,8 +16,8 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const Contract = require('../../../caver-klay-contract')
-const { determineSendParams, ERC20_TYPES, ERC20_ABI_CODE } = require('../../kctHelper')
+const Contract = require('../../caver-klay-contract')
+const { determineSendParams, ERC20_TYPES, ERC20_ABI_CODE } = require('../kctHelper')
 
 class ERC20Simple extends Contract {
     constructor(tokenAddress, abi = ERC20_ABI_CODE[ERC20_TYPES.SIMPLE].abi) {
