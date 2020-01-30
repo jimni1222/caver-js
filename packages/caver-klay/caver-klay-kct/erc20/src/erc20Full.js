@@ -17,7 +17,7 @@
 */
 
 const ERC20Simple = require('./erc20Simple')
-const { ERC20_TYPES, ERC20_ABI_CODE } = require('../../kctHelper')
+const { determineSendParams, ERC20_TYPES, ERC20_ABI_CODE } = require('../../kctHelper')
 
 class ERC20Full extends ERC20Simple {
     constructor(tokenAddress) {
@@ -28,60 +28,75 @@ class ERC20Full extends ERC20Simple {
         return new this.constructor(tokenAddress)
     }
 
-    // Below methods are for ERC20Mintable (extends)
     isMinter(account) {
         return this.methods.isMinter(account).call()
     }
 
-    mint(msgSender, account, amount) {
-        const gas = 45000
-        return this.methods.mint(account, amount).send({ from: msgSender, gas })
-    }
-
-    addMinter(msgSender, account) {
-        const gas = 50000
-        return this.methods.addMinter(account).send({ from: msgSender, gas })
-    }
-
-    renounceMinter(minterToRemove) {
-        const gas = 30000
-        return this.methods.renounceMinter().send({ from: minterToRemove, gas })
-    }
-
-    // Below methods are for ERC20Burnable (extends)
-    burn(msgSender, amount) {
-        const gas = 70000
-        return this.methods.burn(amount).send({ from: msgSender, gas })
-    }
-
-    burnFrom(msgSender, from, amount) {
-        const gas = 70000
-        return this.methods.burnFrom(from, amount).send({ from: msgSender, gas })
-    }
-
-    // Below methods are for ERC20Pausable (extends)
     isPauser(account) {
         return this.methods.isPauser(account).call()
     }
 
-    addPauser(msgSender, account) {
-        const gas = 50000
-        return this.methods.addPauser(account).send({ from: msgSender, gas })
+    async mint(account, amount, sendParam = {}) {
+        const executableObj = this.methods.mint(account, amount)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 
-    pause(msgSender) {
-        const gas = 45000
-        return this.methods.pause().send({ from: msgSender, gas })
+    async addMinter(account, sendParam = {}) {
+        const executableObj = this.methods.addMinter(account)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 
-    unpause(msgSender) {
-        const gas = 30000
-        return this.methods.unpause().send({ from: msgSender, gas })
+    async renounceMinter(sendParam = {}) {
+        const executableObj = this.methods.renounceMinter()
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 
-    renouncePauser(pauserToRemove) {
-        const gas = 30000
-        return this.methods.renouncePauser().send({ from: pauserToRemove, gas })
+    async burn(amount, sendParam = {}) {
+        const executableObj = this.methods.burn(amount)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async burnFrom(from, amount, sendParam = {}) {
+        const executableObj = this.methods.burnFrom(from, amount)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async addPauser(account, sendParam = {}) {
+        const executableObj = this.methods.addPauser(account)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async pause(sendParam = {}) {
+        const executableObj = this.methods.pause()
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async unpause(sendParam = {}) {
+        const executableObj = this.methods.unpause()
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async renouncePauser(sendParam = {}) {
+        const executableObj = this.methods.renouncePauser()
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 }
 

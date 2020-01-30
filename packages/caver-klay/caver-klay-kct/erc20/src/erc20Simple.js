@@ -17,7 +17,7 @@
 */
 
 const Contract = require('../../../caver-klay-contract')
-const { ERC20_TYPES, ERC20_ABI_CODE } = require('../../kctHelper')
+const { determineSendParams, ERC20_TYPES, ERC20_ABI_CODE } = require('../../kctHelper')
 
 class ERC20Simple extends Contract {
     constructor(tokenAddress, abi = ERC20_ABI_CODE[ERC20_TYPES.SIMPLE].abi) {
@@ -53,19 +53,25 @@ class ERC20Simple extends Contract {
         return this.methods.allowance(owner, spender).call()
     }
 
-    approve(msgSender, spender, amount) {
-        const gas = 60000
-        return this.methods.approve(spender, amount).send({ from: msgSender, gas })
+    async approve(spender, amount, sendParam = {}) {
+        const executableObj = this.methods.approve(spender, amount)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 
-    transfer(msgSender, to, amount) {
-        const gas = 60000
-        return this.methods.transfer(to, amount).send({ from: msgSender, gas })
+    async transfer(to, amount, sendParam = {}) {
+        const executableObj = this.methods.transfer(to, amount)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 
-    transferFrom(msgSender, from, to, amount) {
-        const gas = 70000
-        return this.methods.transferFrom(from, to, amount).send({ from: msgSender, gas })
+    async transferFrom(from, to, amount, sendParam = {}) {
+        const executableObj = this.methods.transferFrom(from, to, amount)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 }
 

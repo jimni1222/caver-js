@@ -16,6 +16,24 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const BigNumber = require('bignumber.js')
+
+async function determineSendParams(executableObj, sendParam, defaultFrom) {
+    let { from, gas } = sendParam
+    from = from || defaultFrom
+    if (!from) throw new Error(`'from' is missing. Pass the object that from field is defined in the last parameter.`)
+
+    if (gas === undefined) {
+        const estimated = await executableObj.estimateGas({ from })
+        const originalGas = new BigNumber(estimated, 10)
+        const bufferGas = new BigNumber(1.2, 10)
+
+        gas = Math.round(originalGas.times(bufferGas))
+    }
+
+    return { from, gas }
+}
+
 const erc20SimpleJsonInterface = [
     {
         constant: true,
@@ -387,4 +405,5 @@ module.exports = {
             code: erc20FullByteCode,
         },
     },
+    determineSendParams,
 }
