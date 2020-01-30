@@ -18,13 +18,26 @@
 
 const _ = require('lodash')
 const Contract = require('../../caver-klay-contract')
-const { erc721JsonInterface, erc721ByteCode } = require('../kctHelper')
+const { erc721JsonInterface, erc721ByteCode, determineSendParams } = require('../kctHelper')
 const { isAddress, toBuffer, isHexStrict, toHex } = require('../../../caver-utils')
 
 class ERC721 extends Contract {
     static deploy(tokenInfo, deployer) {
+        _validateParamObjForDeploy(tokenInfo)
+
+        const { name, symbol } = tokenInfo
         const erc721 = new ERC721()
-        return erc721.deploy(tokenInfo, deployer)
+
+        return erc721
+            .deploy({
+                data: erc721ByteCode,
+                arguments: [name, symbol],
+            })
+            .send({ from: deployer, gas: 6600000, value: 0 })
+    }
+
+    static create(tokenAddress) {
+        return new ERC721(tokenAddress)
     }
 
     constructor(tokenAddress) {
@@ -36,23 +49,6 @@ class ERC721 extends Contract {
 
     clone(tokenAddress) {
         return new this.constructor(tokenAddress)
-    }
-
-    deploy(tokenInfo, deployer) {
-        if (this.options.address) throw new Error(`The token contract is already deployed at ${this.options.address}.`)
-
-        validateParamObjForDeploy(tokenInfo)
-
-        const { name, symbol } = tokenInfo
-        const gas = 6600000
-        const value = 0
-
-        return super
-            .deploy({
-                data: erc721ByteCode,
-                arguments: [name, symbol],
-            })
-            .send({ from: deployer, gas, value })
     }
 
     name() {
@@ -87,66 +83,16 @@ class ERC721 extends Contract {
         return this.methods.ownerOf(tokenId).call()
     }
 
-    approve(msgSender, to, tokenId) {
-        const gas = 60000
-        return this.methods.approve(to, tokenId).send({ from: msgSender, gas })
-    }
-
     getApproved(tokenId) {
         return this.methods.getApproved(tokenId).call()
-    }
-
-    setApprovalForAll(msgSender, to, approved) {
-        const gas = 60000
-        return this.methods.setApprovalForAll(to, approved).send({ from: msgSender, gas })
     }
 
     isApprovedForAll(owner, operator) {
         return this.methods.isApprovedForAll(owner, operator).call()
     }
 
-    transferFrom(msgSender, from, to, tokenId) {
-        const gas = 150000
-        return this.methods.transferFrom(from, to, tokenId).send({ from: msgSender, gas })
-    }
-
-    safeTransferFrom(msgSender, from, to, tokenId, data) {
-        const gas = 200000
-
-        if (data && !_.isBuffer(data)) {
-            if (_.isString(data) && !isHexStrict(data)) data = toHex(data)
-            data = toBuffer(data)
-        }
-
-        const prepareRequest = data
-            ? this.methods.safeTransferFrom(from, to, tokenId, data)
-            : this.methods.safeTransferFrom(from, to, tokenId)
-        return prepareRequest.send({ from: msgSender, gas })
-    }
-
     isMinter(account) {
         return this.methods.isMinter(account).call()
-    }
-
-    addMinter(msgSender, account) {
-        const gas = 50000
-        return this.methods.addMinter(account).send({ from: msgSender, gas })
-    }
-
-    renounceMinter(minterToRemove) {
-        // TODO: gas check !!! gasUsed is 14000???
-        const gas = 30000
-        return this.methods.renounceMinter().send({ from: minterToRemove, gas })
-    }
-
-    mintWithTokenURI(msgSender, to, tokenId, tokenURI) {
-        const gas = 300000
-        return this.methods.mintWithTokenURI(to, tokenId, tokenURI).send({ from: msgSender, gas })
-    }
-
-    burn(msgSender, tokenId) {
-        const gas = 200000
-        return this.methods.burn(tokenId).send({ from: msgSender, gas })
     }
 
     paused() {
@@ -157,29 +103,106 @@ class ERC721 extends Contract {
         return this.methods.isPauser(account).call()
     }
 
-    pause(msgSender) {
-        const gas = 45000
-        return this.methods.pause().send({ from: msgSender, gas })
+    async approve(to, tokenId, sendParam = {}) {
+        const executableObj = this.methods.approve(to, tokenId)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 
-    unpause(msgSender) {
-        const gas = 30000
-        return this.methods.unpause().send({ from: msgSender, gas })
+    async setApprovalForAll(to, approved, sendParam = {}) {
+        const executableObj = this.methods.setApprovalForAll(to, approved)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 
-    addPauser(msgSender, account) {
-        const gas = 50000
-        return this.methods.addPauser(account).send({ from: msgSender, gas })
+    async transferFrom(from, to, tokenId, sendParam = {}) {
+        const executableObj = this.methods.transferFrom(from, to, tokenId)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 
-    renouncePauser(pauserToRemove) {
-        // TODO: gas check !!! gasUsed is 14000???
-        const gas = 30000
-        return this.methods.renouncePauser().send({ from: pauserToRemove, gas })
+    async safeTransferFrom(from, to, tokenId, data, sendParam = {}) {
+        if (data && _.isObject(data)) {
+            if (Object.keys(sendParam).length > 0) throw new Error(`Invalid parameters`)
+            sendParam = data
+            data = undefined
+        }
+
+        if (data && !_.isBuffer(data)) {
+            if (_.isString(data) && !isHexStrict(data)) data = toHex(data)
+            data = toBuffer(data)
+        }
+
+        const executableObj = data
+            ? this.methods.safeTransferFrom(from, to, tokenId, data)
+            : this.methods.safeTransferFrom(from, to, tokenId)
+
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async addMinter(account, sendParam = {}) {
+        const executableObj = this.methods.addMinter(account)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async renounceMinter(sendParam = {}) {
+        const executableObj = this.methods.renounceMinter()
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async mintWithTokenURI(to, tokenId, tokenURI, sendParam = {}) {
+        const executableObj = this.methods.mintWithTokenURI(to, tokenId, tokenURI)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async burn(tokenId, sendParam = {}) {
+        const executableObj = this.methods.burn(tokenId)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async pause(sendParam = {}) {
+        const executableObj = this.methods.pause()
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async unpause(sendParam = {}) {
+        const executableObj = this.methods.unpause()
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async addPauser(account, sendParam = {}) {
+        const executableObj = this.methods.addPauser(account)
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    async renouncePauser(sendParam = {}) {
+        const executableObj = this.methods.renouncePauser()
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
     }
 }
 
-function validateParamObjForDeploy(obj) {
+function _validateParamObjForDeploy(obj) {
     if (!obj.name || !_.isString(obj.name)) throw new Error(`Invalid name of token`)
     if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`Invalid symbol of token`)
 }
