@@ -33,13 +33,13 @@ const CODE_HASH = {
 function deploySimple(tokenInfo, deployer) {
     _validateParamObjForDeploy(tokenInfo)
 
-    const { name, symbol, decimal, initialSupply } = tokenInfo
+    const { name, symbol, decimals, initialSupply } = tokenInfo
     const erc20 = new ERC20Simple()
 
     return erc20
         .deploy({
             data: ERC20_ABI_CODE[ERC20_TYPES.SIMPLE].code,
-            arguments: [name, symbol, decimal, initialSupply],
+            arguments: [name, symbol, decimals, initialSupply],
         })
         .send({ from: deployer, gas: 3500000, value: 0 })
 }
@@ -47,13 +47,13 @@ function deploySimple(tokenInfo, deployer) {
 function deploy(tokenInfo, deployer) {
     _validateParamObjForDeploy(tokenInfo)
 
-    const { name, symbol, decimal, initialSupply } = tokenInfo
+    const { name, symbol, decimals, initialSupply } = tokenInfo
 
     const erc20 = new ERC20Full()
     return erc20
         .deploy({
             data: ERC20_ABI_CODE[ERC20_TYPES.FULL].code,
-            arguments: [name, symbol, decimal, initialSupply],
+            arguments: [name, symbol, decimals, initialSupply],
         })
         .send({ from: deployer, gas: 3500000, value: 0 })
 }
@@ -70,7 +70,9 @@ async function create(tokenAddress) {
     }).createFunction()
 
     const result = await getAccount(tokenAddress)
-    if (result.accType !== 2) throw new Error(`Invalid token contract address(${tokenAddress})`)
+    if (result.accType !== 2) {
+        throw new Error(`Invalid token contract (${tokenAddress}). The account type should be 2 but got ${result.accType}`)
+    }
     if (result.account.codeHash === CODE_HASH.SIMPLE) {
         return new ERC20Simple(tokenAddress)
     }
@@ -90,7 +92,7 @@ function setProvider(provider, accounts) {
 function _validateParamObjForDeploy(obj) {
     if (!obj.name || !_.isString(obj.name)) throw new Error(`Invalid name of token`)
     if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`Invalid symbol of token`)
-    if (obj.decimal === undefined || !_.isNumber(obj.decimal)) throw new Error(`Invalid decimal of token`)
+    if (obj.decimals === undefined || !_.isNumber(obj.decimals)) throw new Error(`Invalid decimals of token`)
     if (obj.initialSupply === undefined || !_.isNumber(obj.initialSupply)) throw new Error(`Invalid initialSupply of token`)
 }
 
