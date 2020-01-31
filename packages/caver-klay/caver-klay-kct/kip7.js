@@ -16,13 +16,26 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const ERC20Simple = require('./erc20Simple')
-const { determineSendParams, ERC20_TYPES, ERC20_ABI_CODE } = require('../kctHelper')
+const KIP5 = require('./kip5')
+const { validateTokenInfoForDeploy, determineSendParams, kip7JsonInterface, kip7ByteCode } = require('./kctHelper')
 
-class ERC20Full extends ERC20Simple {
+class KIP7 extends KIP5 {
+    static deploy(tokenInfo, deployer) {
+        validateTokenInfoForDeploy(tokenInfo)
+
+        const { name, symbol, decimals, initialSupply } = tokenInfo
+        const erc20 = new KIP7()
+
+        return erc20
+            .deploy({
+                data: kip7ByteCode,
+                arguments: [name, symbol, decimals, initialSupply],
+            })
+            .send({ from: deployer, gas: 3500000, value: 0 })
+    }
+
     constructor(tokenAddress) {
-        super(tokenAddress, ERC20_ABI_CODE[ERC20_TYPES.FULL].abi)
-        this.type = ERC20_TYPES.FULL
+        super(tokenAddress, kip7JsonInterface)
     }
 
     clone(tokenAddress) {
@@ -105,4 +118,4 @@ class ERC20Full extends ERC20Simple {
     }
 }
 
-module.exports = ERC20Full
+module.exports = KIP7

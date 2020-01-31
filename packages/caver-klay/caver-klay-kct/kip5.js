@@ -16,13 +16,26 @@
     along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
-const Contract = require('../../caver-klay-contract')
-const { determineSendParams, ERC20_TYPES, ERC20_ABI_CODE } = require('../kctHelper')
+const Contract = require('../caver-klay-contract/src')
+const { validateTokenInfoForDeploy, determineSendParams, kip5JsonInterface, kip5ByteCode } = require('./kctHelper')
 
-class ERC20Simple extends Contract {
-    constructor(tokenAddress, abi = ERC20_ABI_CODE[ERC20_TYPES.SIMPLE].abi) {
+class KIP5 extends Contract {
+    static deploy(tokenInfo, deployer) {
+        validateTokenInfoForDeploy(tokenInfo)
+
+        const { name, symbol, decimals, initialSupply } = tokenInfo
+        const erc20 = new KIP5()
+
+        return erc20
+            .deploy({
+                data: kip5ByteCode,
+                arguments: [name, symbol, decimals, initialSupply],
+            })
+            .send({ from: deployer, gas: 3500000, value: 0 })
+    }
+
+    constructor(tokenAddress, abi = kip5JsonInterface) {
         super(abi, tokenAddress)
-        this.type = ERC20_TYPES.SIMPLE
     }
 
     clone(tokenAddress) {
@@ -75,4 +88,4 @@ class ERC20Simple extends Contract {
     }
 }
 
-module.exports = ERC20Simple
+module.exports = KIP5
