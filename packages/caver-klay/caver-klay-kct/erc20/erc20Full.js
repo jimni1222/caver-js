@@ -37,6 +37,10 @@ class ERC20Full extends ERC20Simple {
         return this.methods.isPauser(account).call()
     }
 
+    paused() {
+        return this.methods.paused().call()
+    }
+
     async mint(account, amount, sendParam = {}) {
         const executableObj = this.methods.mint(account, amount)
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
