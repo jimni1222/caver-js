@@ -20,6 +20,11 @@ const _ = require('lodash')
 const BigNumber = require('bignumber.js')
 const { isBigNumber } = require('../../caver-utils')
 
+const KCT_TYPE = {
+    FUNGIBLE: 'Fungible',
+    NONFUNGIBLE: 'NonFungible',
+}
+
 async function determineSendParams(executableObj, sendParam, defaultFrom) {
     let { from, gas } = sendParam
     from = from || defaultFrom
@@ -51,21 +56,23 @@ function convertToNumberString(value) {
     return numberString
 }
 
-function validateTokenInfoForDeploy(obj) {
+function validateTokenInfoForDeploy(obj, type = KCT_TYPE.FUNGIBLE) {
     const errorFormat = 'Failed to validate token info for deploy: '
     if (!obj.name || !_.isString(obj.name)) throw new Error(`${errorFormat}Invalid name of token`)
     if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`${errorFormat}Invalid symbol of token`)
-    if (obj.decimals === undefined || !_.isNumber(obj.decimals)) throw new Error(`${errorFormat}Invalid decimals of token`)
+    if (type === KCT_TYPE.FUNGIBLE) {
+        if (obj.decimals === undefined || !_.isNumber(obj.decimals)) throw new Error(`${errorFormat}Invalid decimals of token`)
 
-    try {
-        if (obj.initialSupply === undefined) {
-            throw new Error(`Invalid initialSupply of token: ${obj.initialSupply}`)
-        } else {
-            obj.initialSupply = convertToNumberString(obj.initialSupply)
+        try {
+            if (obj.initialSupply === undefined) {
+                throw new Error(`Invalid initialSupply of token: ${obj.initialSupply}`)
+            } else {
+                obj.initialSupply = convertToNumberString(obj.initialSupply)
+            }
+        } catch (e) {
+            // Catch the error here to add more details to the error message.
+            throw new Error(`${errorFormat}${e.message}`)
         }
-    } catch (e) {
-        // Catch the error here to add more details to the error message.
-        throw new Error(`${errorFormat}${e.message}`)
     }
 }
 
@@ -547,4 +554,5 @@ module.exports = {
     formatParamForUint256,
     erc721JsonInterface,
     erc721ByteCode,
+    KCT_TYPE,
 }

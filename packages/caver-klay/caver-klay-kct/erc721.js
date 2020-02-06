@@ -17,13 +17,13 @@
 */
 
 const _ = require('lodash')
-const Contract = require('../../caver-klay-contract')
-const { erc721JsonInterface, erc721ByteCode, determineSendParams } = require('../kctHelper')
-const { isAddress, toBuffer, isHexStrict, toHex } = require('../../../caver-utils')
+const Contract = require('../caver-klay-contract/src')
+const { KCT_TYPE, validateTokenInfoForDeploy, erc721JsonInterface, erc721ByteCode, determineSendParams } = require('./kctHelper')
+const { toBuffer, isHexStrict, toHex } = require('../../caver-utils/src')
 
 class ERC721 extends Contract {
     static deploy(tokenInfo, deployer) {
-        _validateParamObjForDeploy(tokenInfo)
+        validateTokenInfoForDeploy(tokenInfo, KCT_TYPE.NONFUNGIBLE)
 
         const { name, symbol } = tokenInfo
         const erc721 = new ERC721()
@@ -36,14 +36,7 @@ class ERC721 extends Contract {
             .send({ from: deployer, gas: 6600000, value: 0 })
     }
 
-    static create(tokenAddress) {
-        return new ERC721(tokenAddress)
-    }
-
     constructor(tokenAddress) {
-        if (tokenAddress && !isAddress(tokenAddress)) {
-            throw new Error(`Invalid token contract address: The address of token contract is ${tokenAddress}.`)
-        }
         super(erc721JsonInterface, tokenAddress)
     }
 
@@ -126,9 +119,11 @@ class ERC721 extends Contract {
 
     async safeTransferFrom(from, to, tokenId, data, sendParam = {}) {
         if (data && _.isObject(data)) {
-            if (Object.keys(sendParam).length > 0) throw new Error(`Invalid parameters`)
-            sendParam = data
-            data = undefined
+            if (data.gas !== undefined || data.from !== undefined) {
+                if (Object.keys(sendParam).length > 0) throw new Error(`Invalid parameters`)
+                sendParam = data
+                data = undefined
+            }
         }
 
         if (data && !_.isBuffer(data)) {
@@ -200,11 +195,6 @@ class ERC721 extends Contract {
 
         return executableObj.send(sendParam)
     }
-}
-
-function _validateParamObjForDeploy(obj) {
-    if (!obj.name || !_.isString(obj.name)) throw new Error(`Invalid name of token`)
-    if (!obj.symbol || !_.isString(obj.symbol)) throw new Error(`Invalid symbol of token`)
 }
 
 module.exports = ERC721
