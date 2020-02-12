@@ -18,30 +18,43 @@
 
 const _ = require('lodash')
 const Contract = require('../caver-klay-contract/src')
-const { KCT_TYPE, validateTokenInfoForDeploy, erc721JsonInterface, erc721ByteCode, determineSendParams } = require('./kctHelper')
+const { KCT_TYPE, validateTokenInfoForDeploy, kip8JsonInterface, kip8ByteCode, determineSendParams } = require('./kctHelper')
 const { toBuffer, isHexStrict, toHex } = require('../../caver-utils/src')
+const { isAddress } = require('../../caver-utils/src')
 
-class ERC721 extends Contract {
+class KIP8 extends Contract {
     static deploy(tokenInfo, deployer) {
         validateTokenInfoForDeploy(tokenInfo, KCT_TYPE.NONFUNGIBLE)
 
         const { name, symbol } = tokenInfo
-        const erc721 = new ERC721()
+        const kip8 = new KIP8()
 
-        return erc721
+        return kip8
             .deploy({
-                data: erc721ByteCode,
+                data: kip8ByteCode,
                 arguments: [name, symbol],
             })
             .send({ from: deployer, gas: 6600000, value: 0 })
     }
 
-    constructor(tokenAddress) {
-        super(erc721JsonInterface, tokenAddress)
+    constructor(tokenAddress, abi = kip8JsonInterface) {
+        if (tokenAddress) {
+            if (_.isString(tokenAddress)) {
+                if (!isAddress(tokenAddress)) throw new Error(`Invalid token address ${tokenAddress}`)
+            } else {
+                abi = tokenAddress
+                tokenAddress = undefined
+            }
+        }
+        super(abi, tokenAddress)
     }
 
-    clone(tokenAddress) {
-        return new this.constructor(tokenAddress)
+    clone(tokenAddress = this.options.address) {
+        return new this.constructor(tokenAddress, this.options.jsonInterface)
+    }
+
+    supportsInterface(interfaceId) {
+        return this.methods.supportsInterface(interfaceId).call()
     }
 
     name() {
@@ -197,4 +210,4 @@ class ERC721 extends Contract {
     }
 }
 
-module.exports = ERC721
+module.exports = KIP8

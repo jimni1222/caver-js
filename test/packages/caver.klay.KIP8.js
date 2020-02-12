@@ -65,10 +65,10 @@ before(function(done) {
     prepareTestSetting().then(() => done())
 })
 
-describe('caver.klay.ERC721', () => {
-    context('caver.klay.ERC721.deploy', () => {
-        it('CAVERJS-UNIT-KCT-062: should deploy non fungible token contract and return ERC721 instance', async () => {
-            const deployed = await caver.klay.ERC721.deploy(tokenInfo, sender.address)
+describe('caver.klay.KIP8', () => {
+    context('caver.klay.KIP8.deploy', () => {
+        it('CAVERJS-UNIT-KCT-062: should deploy non fungible token contract and return KIP8 instance', async () => {
+            const deployed = await caver.klay.KIP8.deploy(tokenInfo, sender.address)
 
             expect(deployed.options.address).not.to.be.undefined
 
@@ -84,20 +84,20 @@ describe('caver.klay.ERC721', () => {
             let expectedError = 'Invalid name of token'
             let insufficientToken = {}
             let invalidToken = { name: 1 }
-            expect(() => caver.klay.ERC721.deploy(insufficientToken, sender.address)).to.throws(expectedError)
-            expect(() => caver.klay.ERC721.deploy(invalidToken, sender.address)).to.throws(expectedError)
+            expect(() => caver.klay.KIP8.deploy(insufficientToken, sender.address)).to.throws(expectedError)
+            expect(() => caver.klay.KIP8.deploy(invalidToken, sender.address)).to.throws(expectedError)
 
             expectedError = 'Invalid symbol of token'
             insufficientToken = { name: 'Jasmine' }
             invalidToken = { name: 'Jasmine', symbol: 1 }
-            expect(() => caver.klay.ERC721.deploy(insufficientToken, sender.address)).to.throws(expectedError)
-            expect(() => caver.klay.ERC721.deploy(invalidToken, sender.address)).to.throws(expectedError)
+            expect(() => caver.klay.KIP8.deploy(insufficientToken, sender.address)).to.throws(expectedError)
+            expect(() => caver.klay.KIP8.deploy(invalidToken, sender.address)).to.throws(expectedError)
         }).timeout(200000)
     })
 
-    context('ERC721.clone', () => {
-        it('CAVERJS-UNIT-KCT-064: should clone ERC721 instance with new token contract address', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+    context('KIP8.clone', () => {
+        it('CAVERJS-UNIT-KCT-064: should clone KIP8 instance with new token contract address', async () => {
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const newTokenContract = caver.klay.accounts.create().address
             const cloned = token.clone(newTokenContract)
@@ -107,9 +107,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.name', () => {
+    context('KIP8.name', () => {
         it('CAVERJS-UNIT-KCT-065: should call name method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const name = await token.name()
 
@@ -117,9 +117,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.symbol', () => {
+    context('KIP8.symbol', () => {
         it('CAVERJS-UNIT-KCT-066: should call symbol method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const symbol = await token.symbol()
 
@@ -127,9 +127,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.totalSupply', () => {
+    context('KIP8.totalSupply', () => {
         it('CAVERJS-UNIT-KCT-067: should call totalSupply method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let totalSupply = await token.totalSupply()
             expect(totalSupply).to.equals('0')
@@ -141,27 +141,27 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.tokenURI', () => {
+    context('KIP8.tokenURI', () => {
         it('CAVERJS-UNIT-KCT-068: should call tokenURI method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const uri = await token.tokenURI('0')
             expect(uri).to.equals(tokenURI)
         }).timeout(200000)
     })
 
-    context('ERC721.tokenOfOwnerByIndex', () => {
+    context('KIP8.tokenOfOwnerByIndex', () => {
         it('CAVERJS-UNIT-KCT-069: should call tokenOfOwnerByIndex method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenByIndex = await token.tokenOfOwnerByIndex(sender.address, 0)
             expect(tokenByIndex).to.equals('0')
         }).timeout(200000)
     })
 
-    context('ERC721.tokenByIndex', () => {
+    context('KIP8.tokenByIndex', () => {
         it('CAVERJS-UNIT-KCT-070: should call tokenByIndex method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let tokenByIndex = await token.tokenByIndex(0)
             expect(tokenByIndex).to.equals('0')
@@ -173,9 +173,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.balanceOf', () => {
+    context('KIP8.balanceOf', () => {
         it('CAVERJS-UNIT-KCT-071: should call balanceOf method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let balance = await token.balanceOf(sender.address)
             expect(balance).to.equals('1')
@@ -185,9 +185,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.ownerOf', () => {
+    context('KIP8.ownerOf', () => {
         it('CAVERJS-UNIT-KCT-072: should call balanceOf method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let owner = await token.ownerOf('0')
             expect(owner.toLowerCase()).to.equals(sender.address.toLowerCase())
@@ -197,9 +197,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.getApproved', () => {
+    context('KIP8.getApproved', () => {
         it('CAVERJS-UNIT-KCT-073: should call getApproved method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let approved = await token.getApproved('0')
             expect(approved).to.equals('0x0000000000000000000000000000000000000000')
@@ -211,9 +211,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.isApprovedForAll', () => {
+    context('KIP8.isApprovedForAll', () => {
         it('CAVERJS-UNIT-KCT-074: should call isApprovedForAll method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let isApprovedForAll = await token.isApprovedForAll(sender.address, testAccount.address)
             expect(isApprovedForAll).to.be.false
@@ -225,9 +225,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.isMinter', () => {
+    context('KIP8.isMinter', () => {
         it('CAVERJS-UNIT-KCT-075: should call isMinter method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let isMinter = await token.isMinter(sender.address)
             expect(isMinter).to.be.true
@@ -247,9 +247,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.paused', () => {
+    context('KIP8.paused', () => {
         it('CAVERJS-UNIT-KCT-076: should call paused method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let paused = await token.paused()
             expect(paused).to.be.false
@@ -266,9 +266,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.isPauser', () => {
+    context('KIP8.isPauser', () => {
         it('CAVERJS-UNIT-KCT-077: should call isPauser method', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let isPauser = await token.isPauser(sender.address)
             expect(isPauser).to.be.true
@@ -288,9 +288,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.approve', () => {
+    context('KIP8.approve', () => {
         it('CAVERJS-UNIT-KCT-078: should send transaction for calling approve method and set approve with token id without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const mintedTokenId = '2'
             await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -311,7 +311,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-079: should send transaction for calling approve method and set approve with token id with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const mintedTokenId = '3'
             await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -329,7 +329,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-080: should send transaction for calling approve method and set approve with token id with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const mintedTokenId = '4'
             await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -349,7 +349,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-081: should send transaction for calling approve method and set approve with token id with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const mintedTokenId = '5'
             await token.mintWithTokenURI(sender.address, mintedTokenId, tokenURI, { from: sender.address })
@@ -373,9 +373,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.setApprovalForAll', () => {
+    context('KIP8.setApprovalForAll', () => {
         it('CAVERJS-UNIT-KCT-082: should send transaction for calling setApprovalForAll method and set approve with all token without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             // set deafult from address in kip7 instance
             token.options.from = sender.address
@@ -393,7 +393,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-083: should send transaction for calling approve method and set approve with all token with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const setApprovalForAll = await token.setApprovalForAll(testAccount.address, true, { from: sender.address })
             expect(setApprovalForAll.from).to.be.equals(sender.address.toLowerCase())
@@ -408,7 +408,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-084: should send transaction for calling approve method and set approve with all token with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const customGasLimit = '0x186a0'
 
@@ -428,7 +428,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-085: should send transaction for calling approve method and set approve with all token with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const customGasLimit = '0x186a0'
 
@@ -449,9 +449,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.transferFrom', () => {
+    context('KIP8.transferFrom', () => {
         it('CAVERJS-UNIT-KCT-086: should send transaction to transfer token and trigger Transfer event without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
@@ -469,7 +469,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-087: should send transaction to transfer token and trigger Transfer event with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
@@ -487,7 +487,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-088: should send transaction to transfer token and trigger Transfer event with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const customGasLimit = '0x249f0'
 
@@ -507,7 +507,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-089: should send transaction to transfer token and trigger Transfer event with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             // set deafult from address in kip7 instance
             token.options.from = testAccount.address
@@ -528,9 +528,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.safeTransferFrom', () => {
+    context('KIP8.safeTransferFrom', () => {
         it('CAVERJS-UNIT-KCT-090: should send token via safeTransferFrom without data and trigger Transfer event without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '6'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -550,7 +550,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-091: should send token via safeTransferFrom without data and trigger Transfer event with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '7'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -570,7 +570,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-092: should send token via safeTransferFrom without data and trigger Transfer event with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '8'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -592,7 +592,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-093: should send token via safeTransferFrom without data and trigger Transfer event with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '9'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -615,7 +615,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-094: should send token via safeTransferFrom with data and trigger Transfer event without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '10'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -641,7 +641,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-095: should send token via safeTransferFrom with data and trigger Transfer event with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '11'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -669,7 +669,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-096: should send token via safeTransferFrom with data and trigger Transfer event with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '12'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -697,7 +697,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-097: should send token via safeTransferFrom with data and trigger Transfer event with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '13'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -728,9 +728,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.addMinter', () => {
+    context('KIP8.addMinter', () => {
         it('CAVERJS-UNIT-KCT-098: should send transaction for adding minter and trigger MinterAdded event without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const newMinter = caver.klay.accounts.create().address
             expect(await token.isMinter(newMinter)).to.be.false
@@ -749,7 +749,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-099: should send transaction for adding minter and trigger MinterAdded event with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const newMinter = caver.klay.accounts.create().address
             expect(await token.isMinter(newMinter)).to.be.false
@@ -765,7 +765,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-100: should send transaction for adding minter and trigger MinterAdded event with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const newMinter = caver.klay.accounts.create().address
             expect(await token.isMinter(newMinter)).to.be.false
@@ -783,7 +783,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-101: should send transaction for adding minter and trigger MinterAdded event with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const newMinter = caver.klay.accounts.create().address
             expect(await token.isMinter(newMinter)).to.be.false
@@ -803,9 +803,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.renounceMinter', () => {
+    context('KIP8.renounceMinter', () => {
         it('CAVERJS-UNIT-KCT-102: should send transaction for removing minter and trigger MinterRemoved event without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.addMinter(testAccount.address, { from: sender.address })
             expect(await token.isMinter(testAccount.address)).to.be.true
@@ -824,7 +824,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-103: should send transaction for removing minter and trigger MinterRemoved event with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.addMinter(testAccount.address, { from: sender.address })
             expect(await token.isMinter(testAccount.address)).to.be.true
@@ -840,7 +840,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-104: should send transaction for removing minter and trigger MinterRemoved event with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.addMinter(testAccount.address, { from: sender.address })
             expect(await token.isMinter(testAccount.address)).to.be.true
@@ -858,7 +858,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-105: should send transaction for removing minter and trigger MinterRemoved event with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.addMinter(testAccount.address, { from: sender.address })
             expect(await token.isMinter(testAccount.address)).to.be.true
@@ -878,9 +878,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.mintWithTokenURI', () => {
+    context('KIP8.mintWithTokenURI', () => {
         it('CAVERJS-UNIT-KCT-106: should send transaction for minting and trigger Transfer event without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const originalSupply = await token.totalSupply()
 
@@ -904,7 +904,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-107: should send transaction for minting and trigger Transfer event with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const originalSupply = await token.totalSupply()
 
@@ -925,7 +925,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-108: should send transaction for minting and trigger Transfer event with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const originalSupply = await token.totalSupply()
 
@@ -951,7 +951,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-109: should send transaction for minting and trigger Transfer event with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const originalSupply = await token.totalSupply()
 
@@ -976,9 +976,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.burn', () => {
+    context('KIP8.burn', () => {
         it('CAVERJS-UNIT-KCT-110: should send transaction for burning and trigger Transfer event without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '14'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -1000,7 +1000,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-111: should send transaction for burning and trigger Transfer event with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '15'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -1019,7 +1019,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-112: should send transaction for burning and trigger Transfer event with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '16'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -1040,7 +1040,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-113: should send transaction for burning and trigger Transfer event with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenId = '17'
             await token.mintWithTokenURI(sender.address, tokenId, tokenURI, { from: sender.address })
@@ -1063,9 +1063,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.pause', () => {
+    context('KIP8.pause', () => {
         it('CAVERJS-UNIT-KCT-114: should send transaction for pausing without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             // set deafult from address in kip7 instance
             token.options.from = sender.address
@@ -1080,7 +1080,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-115: should send transaction for pausing with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const doPause = await token.pause({ from: sender.address })
             expect(doPause.from).to.be.equals(sender.address.toLowerCase())
@@ -1092,7 +1092,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-116: should send transaction for pausing with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const customGasLimit = '0x30d40'
             const doPause = await token.pause({ from: sender.address, gas: customGasLimit })
@@ -1106,7 +1106,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-117: should send transaction for pausing with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             // set deafult from address in kip7 instance
             token.options.from = sender.address
@@ -1122,9 +1122,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.unpause', () => {
+    context('KIP8.unpause', () => {
         it('CAVERJS-UNIT-KCT-118: should send transaction for unpausing without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.pause({ from: sender.address })
 
@@ -1139,7 +1139,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-119: should send transaction for unpausing with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.pause({ from: sender.address })
 
@@ -1151,7 +1151,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-120: should send transaction for unpausing with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.pause({ from: sender.address })
 
@@ -1165,7 +1165,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-121: should send transaction for unpausing with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.pause({ from: sender.address })
 
@@ -1181,9 +1181,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.addPauser', () => {
+    context('KIP8.addPauser', () => {
         it('CAVERJS-UNIT-KCT-122: should send transaction for adding pauser and trigger PauserAdded event without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const newPauser = caver.klay.accounts.create().address
             expect(await token.isPauser(newPauser)).to.be.false
@@ -1202,7 +1202,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-123: should send transaction for adding pauser and trigger PauserAdded event with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const newPauser = caver.klay.accounts.create().address
             expect(await token.isPauser(newPauser)).to.be.false
@@ -1218,7 +1218,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-124: should send transaction for adding pauser and trigger PauserAdded event with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const newPauser = caver.klay.accounts.create().address
             expect(await token.isPauser(newPauser)).to.be.false
@@ -1236,7 +1236,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-125: should send transaction for adding pauser and trigger PauserAdded event with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const newPauser = caver.klay.accounts.create().address
             expect(await token.isPauser(newPauser)).to.be.false
@@ -1256,9 +1256,9 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
     })
 
-    context('ERC721.renouncePauser', () => {
+    context('KIP8.renouncePauser', () => {
         it('CAVERJS-UNIT-KCT-126: should send transaction for removing pauser and trigger PauserRemoved event without sendParams', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.addPauser(testAccount.address, { from: sender.address })
             expect(await token.isPauser(testAccount.address)).to.be.true
@@ -1277,7 +1277,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-127: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(from)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.addPauser(testAccount.address, { from: sender.address })
             expect(await token.isPauser(testAccount.address)).to.be.true
@@ -1293,7 +1293,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-128: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(from, gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.addPauser(testAccount.address, { from: sender.address })
             expect(await token.isPauser(testAccount.address)).to.be.true
@@ -1311,7 +1311,7 @@ describe('caver.klay.ERC721', () => {
         }).timeout(200000)
 
         it('CAVERJS-UNIT-KCT-129: should send transaction for removing pauser and trigger PauserRemoved event with sendParams(gas)', async () => {
-            const token = new caver.klay.ERC721(nonFungibleTokenAddress)
+            const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             await token.addPauser(testAccount.address, { from: sender.address })
             expect(await token.isPauser(testAccount.address)).to.be.true
