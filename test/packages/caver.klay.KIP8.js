@@ -1073,6 +1073,9 @@ describe('caver.klay.KIP8', () => {
             const doPause = await token.pause()
             expect(doPause.from).to.be.equals(sender.address.toLowerCase())
             expect(doPause.status).to.be.true
+            expect(doPause.events).not.to.be.undefined
+            expect(doPause.events.Paused).not.to.be.undefined
+            expect(doPause.events.Paused.address).to.equals(nonFungibleTokenAddress)
 
             expect(await token.paused()).to.be.true
 
@@ -1085,6 +1088,9 @@ describe('caver.klay.KIP8', () => {
             const doPause = await token.pause({ from: sender.address })
             expect(doPause.from).to.be.equals(sender.address.toLowerCase())
             expect(doPause.status).to.be.true
+            expect(doPause.events).not.to.be.undefined
+            expect(doPause.events.Paused).not.to.be.undefined
+            expect(doPause.events.Paused.address).to.equals(nonFungibleTokenAddress)
 
             expect(await token.paused()).to.be.true
 
@@ -1099,6 +1105,9 @@ describe('caver.klay.KIP8', () => {
             expect(doPause.gas).to.equals(customGasLimit)
             expect(doPause.from).to.be.equals(sender.address.toLowerCase())
             expect(doPause.status).to.be.true
+            expect(doPause.events).not.to.be.undefined
+            expect(doPause.events.Paused).not.to.be.undefined
+            expect(doPause.events.Paused.address).to.equals(nonFungibleTokenAddress)
 
             expect(await token.paused()).to.be.true
 
@@ -1115,6 +1124,9 @@ describe('caver.klay.KIP8', () => {
             const doPause = await token.pause({ gas: customGasLimit })
             expect(doPause.from).to.be.equals(sender.address.toLowerCase())
             expect(doPause.status).to.be.true
+            expect(doPause.events).not.to.be.undefined
+            expect(doPause.events.Paused).not.to.be.undefined
+            expect(doPause.events.Paused.address).to.equals(nonFungibleTokenAddress)
 
             expect(await token.paused()).to.be.true
 
@@ -1131,9 +1143,12 @@ describe('caver.klay.KIP8', () => {
             // set deafult from address in kip7 instance
             token.options.from = sender.address
 
-            const doPause = await token.unpause()
-            expect(doPause.from).to.be.equals(sender.address.toLowerCase())
-            expect(doPause.status).to.be.true
+            const doUnpause = await token.unpause()
+            expect(doUnpause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doUnpause.status).to.be.true
+            expect(doUnpause.events).not.to.be.undefined
+            expect(doUnpause.events.Unpaused).not.to.be.undefined
+            expect(doUnpause.events.Unpaused.address).to.equals(nonFungibleTokenAddress)
 
             expect(await token.paused()).to.be.false
         }).timeout(200000)
@@ -1143,9 +1158,12 @@ describe('caver.klay.KIP8', () => {
 
             await token.pause({ from: sender.address })
 
-            const doPause = await token.unpause({ from: sender.address })
-            expect(doPause.from).to.be.equals(sender.address.toLowerCase())
-            expect(doPause.status).to.be.true
+            const doUnpause = await token.unpause({ from: sender.address })
+            expect(doUnpause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doUnpause.status).to.be.true
+            expect(doUnpause.events).not.to.be.undefined
+            expect(doUnpause.events.Unpaused).not.to.be.undefined
+            expect(doUnpause.events.Unpaused.address).to.equals(nonFungibleTokenAddress)
 
             expect(await token.paused()).to.be.false
         }).timeout(200000)
@@ -1156,10 +1174,13 @@ describe('caver.klay.KIP8', () => {
             await token.pause({ from: sender.address })
 
             const customGasLimit = '0x30d40'
-            const doPause = await token.unpause({ from: sender.address, gas: customGasLimit })
-            expect(doPause.gas).to.equals(customGasLimit)
-            expect(doPause.from).to.be.equals(sender.address.toLowerCase())
-            expect(doPause.status).to.be.true
+            const doUnpause = await token.unpause({ from: sender.address, gas: customGasLimit })
+            expect(doUnpause.gas).to.equals(customGasLimit)
+            expect(doUnpause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doUnpause.status).to.be.true
+            expect(doUnpause.events).not.to.be.undefined
+            expect(doUnpause.events.Unpaused).not.to.be.undefined
+            expect(doUnpause.events.Unpaused.address).to.equals(nonFungibleTokenAddress)
 
             expect(await token.paused()).to.be.false
         }).timeout(200000)
@@ -1173,9 +1194,12 @@ describe('caver.klay.KIP8', () => {
             token.options.from = sender.address
 
             const customGasLimit = '0x30d40'
-            const doPause = await token.unpause({ gas: customGasLimit })
-            expect(doPause.from).to.be.equals(sender.address.toLowerCase())
-            expect(doPause.status).to.be.true
+            const doUnpause = await token.unpause({ gas: customGasLimit })
+            expect(doUnpause.from).to.be.equals(sender.address.toLowerCase())
+            expect(doUnpause.status).to.be.true
+            expect(doUnpause.events).not.to.be.undefined
+            expect(doUnpause.events.Unpaused).not.to.be.undefined
+            expect(doUnpause.events.Unpaused.address).to.equals(nonFungibleTokenAddress)
 
             expect(await token.paused()).to.be.false
         }).timeout(200000)
