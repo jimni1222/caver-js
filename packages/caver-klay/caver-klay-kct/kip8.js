@@ -17,8 +17,17 @@
 */
 
 const _ = require('lodash')
+const BigNumber = require('bignumber.js')
+
 const Contract = require('../caver-klay-contract/src')
-const { KCT_TYPE, validateTokenInfoForDeploy, kip8JsonInterface, kip8ByteCode, determineSendParams } = require('./kctHelper')
+const {
+    KCT_TYPE,
+    validateTokenInfoForDeploy,
+    kip8JsonInterface,
+    kip8ByteCode,
+    determineSendParams,
+    formatParamForUint256,
+} = require('./kctHelper')
 const { toBuffer, isHexStrict, toHex } = require('../../caver-utils/src')
 const { isAddress } = require('../../caver-utils/src')
 
@@ -53,64 +62,78 @@ class KIP8 extends Contract {
         return new this.constructor(tokenAddress, this.options.jsonInterface)
     }
 
-    supportsInterface(interfaceId) {
-        return this.methods.supportsInterface(interfaceId).call()
+    async supportsInterface(interfaceId) {
+        const isSupported = await this.methods.supportsInterface(interfaceId).call()
+        return isSupported
     }
 
-    name() {
-        return this.methods.name().call()
+    async name() {
+        const name = await this.methods.name().call()
+        return name
     }
 
-    symbol() {
-        return this.methods.symbol().call()
+    async symbol() {
+        const symbol = await this.methods.symbol().call()
+        return symbol
     }
 
-    tokenURI(tokenId) {
-        return this.methods.tokenURI(tokenId).call()
+    async tokenURI(tokenId) {
+        const tokenURI = await this.methods.tokenURI(formatParamForUint256(tokenId)).call()
+        return tokenURI
     }
 
-    totalSupply() {
-        return this.methods.totalSupply().call()
+    async totalSupply() {
+        const totalSupply = await this.methods.totalSupply().call()
+        return new BigNumber(totalSupply)
     }
 
-    tokenOfOwnerByIndex(owner, index) {
-        return this.methods.tokenOfOwnerByIndex(owner, index).call()
+    async tokenOfOwnerByIndex(owner, index) {
+        const token = await this.methods.tokenOfOwnerByIndex(owner, formatParamForUint256(index)).call()
+        return new BigNumber(token)
     }
 
-    tokenByIndex(index) {
-        return this.methods.tokenByIndex(index).call()
+    async tokenByIndex(index) {
+        const token = await this.methods.tokenByIndex(formatParamForUint256(index)).call()
+        return new BigNumber(token)
     }
 
-    balanceOf(account) {
-        return this.methods.balanceOf(account).call()
+    async balanceOf(account) {
+        const balance = await this.methods.balanceOf(account).call()
+        return new BigNumber(balance)
     }
 
-    ownerOf(tokenId) {
-        return this.methods.ownerOf(tokenId).call()
+    async ownerOf(tokenId) {
+        const owner = await this.methods.ownerOf(formatParamForUint256(tokenId)).call()
+        return owner
     }
 
-    getApproved(tokenId) {
-        return this.methods.getApproved(tokenId).call()
+    async getApproved(tokenId) {
+        const isApproved = await this.methods.getApproved(formatParamForUint256(tokenId)).call()
+        return isApproved
     }
 
-    isApprovedForAll(owner, operator) {
-        return this.methods.isApprovedForAll(owner, operator).call()
+    async isApprovedForAll(owner, operator) {
+        const isApprovedForAll = await this.methods.isApprovedForAll(owner, operator).call()
+        return isApprovedForAll
     }
 
-    isMinter(account) {
-        return this.methods.isMinter(account).call()
+    async isMinter(account) {
+        const isMinter = await this.methods.isMinter(account).call()
+        return isMinter
     }
 
-    paused() {
-        return this.methods.paused().call()
+    async paused() {
+        const isPaused = await this.methods.paused().call()
+        return isPaused
     }
 
-    isPauser(account) {
-        return this.methods.isPauser(account).call()
+    async isPauser(account) {
+        const isPauser = await this.methods.isPauser(account).call()
+        return isPauser
     }
 
     async approve(to, tokenId, sendParam = {}) {
-        const executableObj = this.methods.approve(to, tokenId)
+        const executableObj = this.methods.approve(to, formatParamForUint256(tokenId))
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)
@@ -124,7 +147,7 @@ class KIP8 extends Contract {
     }
 
     async transferFrom(from, to, tokenId, sendParam = {}) {
-        const executableObj = this.methods.transferFrom(from, to, tokenId)
+        const executableObj = this.methods.transferFrom(from, to, formatParamForUint256(tokenId))
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)
@@ -145,8 +168,8 @@ class KIP8 extends Contract {
         }
 
         const executableObj = data
-            ? this.methods.safeTransferFrom(from, to, tokenId, data)
-            : this.methods.safeTransferFrom(from, to, tokenId)
+            ? this.methods.safeTransferFrom(from, to, formatParamForUint256(tokenId), data)
+            : this.methods.safeTransferFrom(from, to, formatParamForUint256(tokenId))
 
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
@@ -168,14 +191,14 @@ class KIP8 extends Contract {
     }
 
     async mintWithTokenURI(to, tokenId, tokenURI, sendParam = {}) {
-        const executableObj = this.methods.mintWithTokenURI(to, tokenId, tokenURI)
+        const executableObj = this.methods.mintWithTokenURI(to, formatParamForUint256(tokenId), tokenURI)
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)
     }
 
     async burn(tokenId, sendParam = {}) {
-        const executableObj = this.methods.burn(tokenId)
+        const executableObj = this.methods.burn(formatParamForUint256(tokenId))
         sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
 
         return executableObj.send(sendParam)

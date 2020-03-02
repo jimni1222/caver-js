@@ -16,6 +16,8 @@
 	along with the caver-js. If not, see <http://www.gnu.org/licenses/>.
 */
 
+const BigNumber = require('bignumber.js')
+
 const testRPCURL = require('../testrpc')
 const { expect } = require('../extendedChai')
 
@@ -132,12 +134,12 @@ describe('caver.klay.KIP8', () => {
             const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let totalSupply = await token.totalSupply()
-            expect(totalSupply).to.equals('0')
+            expect(totalSupply.eq(0)).to.be.true
 
             await token.mintWithTokenURI(sender.address, totalSupply, tokenURI, { from: sender.address })
 
             totalSupply = await token.totalSupply()
-            expect(totalSupply).to.equals('1')
+            expect(totalSupply.eq(1)).to.be.true
         }).timeout(200000)
     })
 
@@ -145,7 +147,13 @@ describe('caver.klay.KIP8', () => {
         it('CAVERJS-UNIT-KCT-068: should call tokenURI method', async () => {
             const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
-            const uri = await token.tokenURI('0')
+            let uri = await token.tokenURI(new BigNumber(0))
+            expect(uri).to.equals(tokenURI)
+
+            uri = await token.tokenURI(0)
+            expect(uri).to.equals(tokenURI)
+
+            uri = await token.tokenURI('0')
             expect(uri).to.equals(tokenURI)
         }).timeout(200000)
     })
@@ -155,7 +163,7 @@ describe('caver.klay.KIP8', () => {
             const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             const tokenByIndex = await token.tokenOfOwnerByIndex(sender.address, 0)
-            expect(tokenByIndex).to.equals('0')
+            expect(tokenByIndex.eq(0)).to.be.true
         }).timeout(200000)
     })
 
@@ -164,12 +172,12 @@ describe('caver.klay.KIP8', () => {
             const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let tokenByIndex = await token.tokenByIndex(0)
-            expect(tokenByIndex).to.equals('0')
+            expect(tokenByIndex.eq(0)).to.be.true
 
             await token.mintWithTokenURI(testAccount.address, '1', tokenURI, { from: sender.address })
 
             tokenByIndex = await token.tokenByIndex(1)
-            expect(tokenByIndex).to.equals('1')
+            expect(tokenByIndex.eq(1)).to.be.true
         }).timeout(200000)
     })
 
@@ -178,10 +186,10 @@ describe('caver.klay.KIP8', () => {
             const token = new caver.klay.KIP8(nonFungibleTokenAddress)
 
             let balance = await token.balanceOf(sender.address)
-            expect(balance).to.equals('1')
+            expect(balance.eq(1)).to.be.true
 
             balance = await token.balanceOf(caver.klay.accounts.create().address)
-            expect(balance).to.equals('0')
+            expect(balance.eq(0)).to.be.true
         }).timeout(200000)
     })
 
@@ -192,7 +200,7 @@ describe('caver.klay.KIP8', () => {
             let owner = await token.ownerOf('0')
             expect(owner.toLowerCase()).to.equals(sender.address.toLowerCase())
 
-            owner = await token.ownerOf('1')
+            owner = await token.ownerOf(new BigNumber(1))
             expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
         }).timeout(200000)
     })
@@ -206,7 +214,7 @@ describe('caver.klay.KIP8', () => {
 
             await token.approve(testAccount.address, '0', { from: sender.address })
 
-            approved = await token.getApproved('0')
+            approved = await token.getApproved(new BigNumber(0))
             expect(approved.toLowerCase()).to.equals(testAccount.address.toLowerCase())
         }).timeout(200000)
     })
