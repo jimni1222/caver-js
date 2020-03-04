@@ -23,42 +23,42 @@ const Contract = require('../caver-klay-contract/src')
 const {
     KCT_TYPE,
     validateTokenInfoForDeploy,
-    kip8JsonInterface,
-    kip8ByteCode,
+    kip17JsonInterface,
+    kip17ByteCode,
     determineSendParams,
     formatParamForUint256,
 } = require('./kctHelper')
 const { toBuffer, isHexStrict, toHex } = require('../../caver-utils/src')
 const { isAddress } = require('../../caver-utils/src')
 
-class KIP8 extends Contract {
+class KIP17 extends Contract {
     /**
-     * deploy deploys a KIP-8 token contract to Klaytn network.
-     * `const deployedContract = await caver.klay.KIP8.deploy({
+     * deploy deploys a KIP-17 token contract to Klaytn network.
+     * `const deployedContract = await caver.klay.KIP17.deploy({
      *      name: 'TokenName',
      *      symbol: 'TKN',
      *  }, '0x{address in hex}')`
      *
      * @method deploy
      * @param {Object} tokenInfo The object that defines the name and symbol of the token to deploy.
-     * @param {String} deployer The address of the account to deploy the KIP-8 token contract.
+     * @param {String} deployer The address of the account to deploy the KIP-17 token contract.
      * @return {Object}
      */
     static deploy(tokenInfo, deployer) {
         validateTokenInfoForDeploy(tokenInfo, KCT_TYPE.NONFUNGIBLE)
 
         const { name, symbol } = tokenInfo
-        const kip8 = new KIP8()
+        const kip17 = new KIP17()
 
-        return kip8
+        return kip17
             .deploy({
-                data: kip8ByteCode,
+                data: kip17ByteCode,
                 arguments: [name, symbol],
             })
             .send({ from: deployer, gas: 6600000, value: 0 })
     }
 
-    constructor(tokenAddress, abi = kip8JsonInterface) {
+    constructor(tokenAddress, abi = kip17JsonInterface) {
         if (tokenAddress) {
             if (_.isString(tokenAddress)) {
                 if (!isAddress(tokenAddress)) throw new Error(`Invalid token address ${tokenAddress}`)
@@ -151,7 +151,7 @@ class KIP8 extends Contract {
 
     /**
      * balanceOf returns the balance of the specified address.
-     * The balance of an account in KIP-8 means that the total number of NFT(Non Fungible Token) owned by the account.
+     * The balance of an account in KIP-17 means that the total number of NFT(Non Fungible Token) owned by the account.
      *
      * @method balanceOf
      * @param {String} account The address of the account whose number of tokens you want to see.
@@ -241,8 +241,8 @@ class KIP8 extends Contract {
      * @param {String} to The address of the account to use on behalf of owner for the tokenId.
      * @param {BigNumber|String|Number} tokenId The id of token the spender allows to use on behalf of the owner.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async approve(to, tokenId, sendParam = {}) {
         const executableObj = this.methods.approve(to, formatParamForUint256(tokenId))
@@ -259,8 +259,8 @@ class KIP8 extends Contract {
      * @param {String} to The address of an account to allow/forbid for transfer of all tokens owned by the owner on behalf of the owner.
      * @param {Boolean} approved Whether to allow sending tokens on behalf of the owner.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async setApprovalForAll(to, approved, sendParam = {}) {
         const executableObj = this.methods.setApprovalForAll(to, approved)
@@ -277,8 +277,8 @@ class KIP8 extends Contract {
      * @param {String} to The address of the account to receive the token.
      * @param {BigNumber|String|Number} tokenId The id of token you want to transfer.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async transferFrom(from, to, tokenId, sendParam = {}) {
         const executableObj = this.methods.transferFrom(from, to, formatParamForUint256(tokenId))
@@ -298,8 +298,8 @@ class KIP8 extends Contract {
      * @param {BigNumber|String|Number} tokenId The id of token you want to transfer.
      * @param {Buffer|String|Number} data The optional data to send along with the call.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async safeTransferFrom(from, to, tokenId, data, sendParam = {}) {
         if (data && _.isObject(data)) {
@@ -331,8 +331,8 @@ class KIP8 extends Contract {
      * @method addMinter
      * @param {String} account The address of account to add as minter.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async addMinter(account, sendParam = {}) {
         const executableObj = this.methods.addMinter(account)
@@ -347,8 +347,8 @@ class KIP8 extends Contract {
      *
      * @method renounceMinter
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async renounceMinter(sendParam = {}) {
         const executableObj = this.methods.renounceMinter()
@@ -365,8 +365,8 @@ class KIP8 extends Contract {
      * @param {BigNumber|String|Number} tokenId The id of token to mint.
      * @param {String} tokenURI The uri of token to mint.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async mintWithTokenURI(to, tokenId, tokenURI, sendParam = {}) {
         const executableObj = this.methods.mintWithTokenURI(to, formatParamForUint256(tokenId), tokenURI)
@@ -376,13 +376,13 @@ class KIP8 extends Contract {
     }
 
     /**
-     * burn destroys a specific KIP-8 token.
+     * burn destroys a specific KIP-17 token.
      *
      * @method burn
      * @param {BigNumber|String|Number} tokenId The id of token to destroy.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async burn(tokenId, sendParam = {}) {
         const executableObj = this.methods.burn(formatParamForUint256(tokenId))
@@ -397,8 +397,8 @@ class KIP8 extends Contract {
      *
      * @method pause
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async pause(sendParam = {}) {
         const executableObj = this.methods.pause()
@@ -415,8 +415,8 @@ class KIP8 extends Contract {
      * @param {String} spender The address of the account to use on behalf of owner for the amount to be set in allowance.
      * @param {BigNumber|String|Number} amount The amount of tokens the spender allows to use on behalf of the owner.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async unpause(sendParam = {}) {
         const executableObj = this.methods.unpause()
@@ -432,8 +432,8 @@ class KIP8 extends Contract {
      * @method addPauser
      * @param {String} account The address of account to add as pauser.
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async addPauser(account, sendParam = {}) {
         const executableObj = this.methods.addPauser(account)
@@ -448,8 +448,8 @@ class KIP8 extends Contract {
      *
      * @method renouncePauser
      * @param {Object} sendParam An object with defined parameters for sending a transaction.
-     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-8 token contract.
-     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-8 abi.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
      */
     async renouncePauser(sendParam = {}) {
         const executableObj = this.methods.renouncePauser()
@@ -459,4 +459,4 @@ class KIP8 extends Contract {
     }
 }
 
-module.exports = KIP8
+module.exports = KIP17
