@@ -356,6 +356,23 @@ class KIP17 extends Contract {
     }
 
     /**
+     * mint creates token and assigns them to account, increasing the total supply.
+     *
+     * @method mint
+     * @param {String} to The address of the account to which the minted token will be allocated.
+     * @param {BigNumber|String|Number} tokenId The id of token to mint.
+     * @param {Object} sendParam An object with defined parameters for sending a transaction.
+     * @return {Object} A receipt containing the execution result of the transaction for executing the KIP-17 token contract.
+     *                  In this receipt, instead of the logs property, there is an events property parsed by KIP-17 abi.
+     */
+    async mint(to, tokenId, sendParam = {}) {
+        const executableObj = this.methods.mint(to, formatParamForUint256(tokenId))
+        sendParam = await determineSendParams(executableObj, sendParam, this.options.from)
+
+        return executableObj.send(sendParam)
+    }
+
+    /**
      * mintWithTokenURI creates token with uri and assigns them to account, increasing the total supply.
      *
      * @method mintWithTokenURI

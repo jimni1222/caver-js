@@ -1373,10 +1373,109 @@ describe('caver.klay.KIP17', () => {
             expect(await token.supportsInterface('0x42966c68')).to.be.true // kip17Burnable
             expect(await token.supportsInterface('0xa19c6cd9')).to.be.true // kip17MetadataMintable
             expect(await token.supportsInterface('0x4d5507ff')).to.be.true // kip17Pausable
+            expect(await token.supportsInterface('0xeab83e20')).to.be.true // kip17Mintable
 
             expect(await token.supportsInterface('0x70a08231')).to.be.false
             expect(await token.supportsInterface('0x6352211e')).to.be.false
             expect(await token.supportsInterface('0x095ea7b3')).to.be.false
+        }).timeout(200000)
+    })
+
+    context('KIP17.mint', () => {
+        it('CAVERJS-UNIT-KCT-140: should send transaction for minting and trigger Transfer event without sendParams', async () => {
+            const token = new caver.klay.KIP17(nonFungibleTokenAddress)
+
+            const originalSupply = await token.totalSupply()
+
+            // set deafult from address in kip7 instance
+            token.options.from = sender.address
+
+            const tokenId = '30'
+            const minted = await token.mint(testAccount.address, tokenId)
+            expect(minted.from).to.be.equals(sender.address.toLowerCase())
+            expect(minted.status).to.be.true
+            expect(minted.events).not.to.be.undefined
+            expect(minted.events.Transfer).not.to.be.undefined
+            expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+
+            const owner = await token.ownerOf(tokenId)
+            expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
+
+            const afterSupply = await token.totalSupply()
+
+            expect(Number(afterSupply) - Number(originalSupply)).to.equals(1)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-141: should send transaction for minting and trigger Transfer event with sendParams(from)', async () => {
+            const token = new caver.klay.KIP17(nonFungibleTokenAddress)
+
+            const originalSupply = await token.totalSupply()
+
+            const tokenId = '31'
+            const minted = await token.mint(testAccount.address, tokenId, { from: sender.address })
+            expect(minted.from).to.be.equals(sender.address.toLowerCase())
+            expect(minted.status).to.be.true
+            expect(minted.events).not.to.be.undefined
+            expect(minted.events.Transfer).not.to.be.undefined
+            expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+
+            const owner = await token.ownerOf(tokenId)
+            expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
+
+            const afterSupply = await token.totalSupply()
+
+            expect(Number(afterSupply) - Number(originalSupply)).to.equals(1)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-142: should send transaction for minting and trigger Transfer event with sendParams(from, gas)', async () => {
+            const token = new caver.klay.KIP17(nonFungibleTokenAddress)
+
+            const originalSupply = await token.totalSupply()
+
+            const customGasLimit = '0x493e0'
+            const tokenId = '32'
+            const minted = await token.mint(testAccount.address, tokenId, {
+                from: sender.address,
+                gas: customGasLimit,
+            })
+            expect(minted.gas).to.equals(customGasLimit)
+            expect(minted.from).to.be.equals(sender.address.toLowerCase())
+            expect(minted.status).to.be.true
+            expect(minted.events).not.to.be.undefined
+            expect(minted.events.Transfer).not.to.be.undefined
+            expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+
+            const owner = await token.ownerOf(tokenId)
+            expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
+
+            const afterSupply = await token.totalSupply()
+
+            expect(Number(afterSupply) - Number(originalSupply)).to.equals(1)
+        }).timeout(200000)
+
+        it('CAVERJS-UNIT-KCT-143: should send transaction for minting and trigger Transfer event with sendParams(gas)', async () => {
+            const token = new caver.klay.KIP17(nonFungibleTokenAddress)
+
+            const originalSupply = await token.totalSupply()
+
+            // set deafult from address in kip7 instance
+            token.options.from = sender.address
+
+            const customGasLimit = '0x493e0'
+            const tokenId = '33'
+            const minted = await token.mint(testAccount.address, tokenId, { gas: customGasLimit })
+            expect(minted.from).to.be.equals(sender.address.toLowerCase())
+            expect(minted.status).to.be.true
+            expect(minted.events).not.to.be.undefined
+            expect(minted.events.Transfer).not.to.be.undefined
+            expect(minted.events.Transfer.address).to.equals(nonFungibleTokenAddress)
+
+            const owner = await token.ownerOf(tokenId)
+            expect(owner.toLowerCase()).to.equals(testAccount.address.toLowerCase())
+
+            const afterSupply = await token.totalSupply()
+
+            expect(Number(afterSupply) - Number(originalSupply)).to.equals(1)
         }).timeout(200000)
     })
 })
