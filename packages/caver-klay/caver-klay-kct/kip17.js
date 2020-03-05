@@ -289,8 +289,6 @@ class KIP17 extends Contract {
 
     /**
      * safeTransferFrom safely transfers the ownership of a given token id to another address.
-     * If the target address is a contract, it must implement IERC721Receiver.onERC721Received, which is called upon a safe transfer,
-     * and return the magic value bytes4(keccak256("onERC721Received(address,address,uint256,bytes)")); otherwise, the transfer is reverted.
      *
      * @method safeTransferFrom
      * @param {String} from The address of the owner or approved of the given token.
