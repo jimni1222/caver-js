@@ -1371,7 +1371,7 @@ describe('caver.klay.KIP17', () => {
             expect(await token.supportsInterface('0x780e9d63')).to.be.true // kip17Enumerable
             expect(await token.supportsInterface('0x5b5e139f')).to.be.true // kip17Metadata
             expect(await token.supportsInterface('0x42966c68')).to.be.true // kip17Burnable
-            expect(await token.supportsInterface('0xa19c6cd9')).to.be.true // kip17MetadataMintable
+            expect(await token.supportsInterface('0xfac27f46')).to.be.true // kip17MetadataMintable
             expect(await token.supportsInterface('0x4d5507ff')).to.be.true // kip17Pausable
             expect(await token.supportsInterface('0xeab83e20')).to.be.true // kip17Mintable
 
