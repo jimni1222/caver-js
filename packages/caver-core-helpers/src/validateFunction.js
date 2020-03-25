@@ -60,7 +60,7 @@ function validateParams(tx) {
     }
 
     // If feePayerSignatures is set in transaction object, feePayer also should be defined together.
-    if (tx.feePayerSignatures && !utils.isEmptySig(tx.feePayerSignatures)) {
+    if (tx.feePayerSignatures && tx.feePayerSignatures.length > 0 && !utils.isEmptySig(tx.feePayerSignatures)) {
         if (!tx.feePayer || tx.feePayer === '0x') {
             error = new Error('"feePayer" is missing: feePayer must be defined with feePayerSignatures.')
         } else if (!utils.isAddress(tx.feePayer)) {
@@ -341,6 +341,7 @@ function validateAccountTransaction(transaction) {
     }
 
     if (
+        !transaction.account &&
         !transaction.key &&
         transaction.legacyKey === undefined &&
         !transaction.publicKey &&
@@ -354,7 +355,20 @@ function validateAccountTransaction(transaction) {
     }
 
     const duplicatedKeyInfo = `The key parameter to be used for ${transaction.type} is duplicated.`
-    if (transaction.key) {
+    if (transaction.account) {
+        if (
+            transaction.key ||
+            transaction.legacyKey !== undefined ||
+            transaction.publicKey ||
+            transaction.multisig ||
+            transaction.roleTransactionKey ||
+            transaction.roleAccountUpdateKey ||
+            transaction.roleFeePayerKey ||
+            transaction.failKey !== undefined
+        ) {
+            return new Error(duplicatedKeyInfo)
+        }
+    } else if (transaction.key) {
         if (
             transaction.legacyKey !== undefined ||
             transaction.publicKey ||

@@ -158,7 +158,7 @@ const inputTransactionFormatter = function(options) {
         options.from = options.from || (this ? this.defaultAccount : null)
 
         if (!options.from && !_.isNumber(options.from)) {
-            throw new Error('The send transactions "from" field must be defined!')
+            if (options.type && options.type !== 'LEGACY') throw new Error('The send transactions "from" field must be defined!')
         }
 
         options.from = inputAddressFormatter(options.from)
