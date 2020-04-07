@@ -55,34 +55,40 @@ before(() => {
 
 describe('get transaction', () => {
     it('CAVERJS-UNIT-ETC-094: getTransaction should return information of transaction.', async () => {
-        const txObj = {
+        const testAccount = caver.klay.accounts.create()
+        caver.klay.accounts.wallet.add(testAccount)
+
+        const legacy = {
             from: senderAddress,
+            to: testAccount.address,
+            value: caver.utils.toPeb(10, 'KLAY'),
+            gas: 150000,
+        }
+        const signed = await caver.klay.accounts.signTransaction(legacy)
+        await caver.klay.sendSignedTransaction(signed.rawTransaction)
+
+        const nonce = await caver.klay.getTransactionCount(testAccount.address)
+        const txObj = {
+            from: testAccount.address,
             to: receiver.address,
             value: 1,
             gas: 900000,
+            nonce: nonce + 1,
         }
-        const receipt = await caver.klay.sendTransaction(txObj)
+        console.log(`Start testing here!!!!!!!!!!!!!!!!!!!!!!!!!!!!`)
+        await caver.klay
+            .sendTransaction(txObj)
+            .on('transactionHash', t => {
+                console.log(`transction hash : ${t}`)
+            })
+            .on('error', e => {
+                console.error(e)
+            })
+            .on('receipt', r => {
+                console.log(`finally receipt`)
+                console.log(r)
+            })
 
-        expect(receipt).not.to.null
-        expect(receipt.blockHash).not.to.undefined
-        expect(receipt.blockNumber).not.to.undefined
-        expect(receipt.contractAddress).not.to.undefined
-        expect(receipt.from).not.to.undefined
-        expect(receipt.gas).not.to.undefined
-        expect(receipt.gasPrice).not.to.undefined
-        expect(receipt.gasUsed).not.to.undefined
-        expect(receipt.logs).not.to.undefined
-        expect(receipt.logsBloom).not.to.undefined
-        expect(receipt.nonce).not.to.undefined
-        expect(receipt.signatures).not.to.undefined
-        expect(receipt.status).equals(true)
-        expect(receipt.to).not.to.undefined
-        expect(receipt.transactionHash).not.to.undefined
-        expect(receipt.transactionIndex).not.to.undefined
-        expect(receipt.type).not.to.undefined
-        expect(receipt.typeInt).not.to.undefined
-        expect(receipt.value).not.to.undefined
-
-        caver.currentProvider.connection.close()
-    }).timeout(10000)
+        // caver.currentProvider.connection.close()
+    }).timeout(30000)
 })

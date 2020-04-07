@@ -189,6 +189,10 @@ Subscription.prototype.unsubscribe = function(callback) {
 Subscription.prototype.subscribe = function() {
     const _this = this
     const args = Array.prototype.slice.call(arguments)
+    console.log(`args in subscribe`)
+    console.log(args)
+    console.log(`this.options`)
+    console.log(this.options)
     const payload = this._toPayload(args)
 
     if (!payload) {
@@ -254,6 +258,7 @@ Subscription.prototype.subscribe = function() {
         delete payload.params[1].fromBlock
     }
 
+    console.log(this.callback)
     this.options.requestManager.send(payload, function(err, result) {
         if (!err && result) {
             _this.id = result
@@ -267,6 +272,7 @@ Subscription.prototype.subscribe = function() {
 
                     ret.forEach(function(resultItem) {
                         const output = _this._formatOutput(resultItem)
+                        console.log(output)
 
                         if (_.isFunction(_this.options.subscription.subscriptionHandler)) {
                             return _this.options.subscription.subscriptionHandler.call(_this, output)
@@ -275,6 +281,7 @@ Subscription.prototype.subscribe = function() {
 
                         // call the callback, last so that unsubscribe there won't affect the emit above
                         if (_.isFunction(_this.callback)) {
+                            console.log(`checkConfirmation will be operated`)
                             _this.callback(null, output, _this)
                         }
                     })

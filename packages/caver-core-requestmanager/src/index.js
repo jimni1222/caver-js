@@ -83,6 +83,9 @@ RequestManager.prototype.setProvider = function(p, net) {
         this.provider.on('data', function requestManagerNotification(result, deprecatedResult) {
             result = result || deprecatedResult // this is for possible old providers, which may had the error first handler
 
+            console.log(`result in requestmanager`)
+            console.log(result)
+            console.log(_this.subscriptions[result.params.subscription].callback)
             // check for result.method, to prevent old providers errors to pass as result
             if (
                 result.method &&
@@ -129,6 +132,7 @@ RequestManager.prototype.send = function(data, callback) {
 
     function sendRPC(provider) {
         return function(p) {
+            console.log(p)
             provider[provider.sendAsync ? 'sendAsync' : 'send'](p, function(err, result) {
                 // Attach inbound middleware
                 if (isMiddlewareExist) middleware.applyMiddleware(p, 'inbound')
@@ -202,6 +206,7 @@ RequestManager.prototype.sendBatch = function(data, callback) {
  */
 RequestManager.prototype.addSubscription = function(id, name, type, callback) {
     if (this.provider.on) {
+        console.log(`addSubscription id: ${id}`)
         this.subscriptions[id] = {
             callback: callback,
             type: type,

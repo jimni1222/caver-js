@@ -516,6 +516,7 @@ const startWatching = function(mutableConfirmationPack, existingReceipt) {
     const { _klaytnCall, intervalId, method } = mutableConfirmationPack
     // if provider allows PUB/SUB
     if (method.requestManager.provider.supportsSubscriptions()) {
+        console.log(`subscribe start with websocket/ existingReceipt: ${existingReceipt}`)
         _klaytnCall.subscribe('newBlockHeaders', checkConfirmation.bind(null, mutableConfirmationPack, existingReceipt, false))
     } else {
         mutableConfirmationPack.intervalId = setInterval(checkConfirmation.bind(null, mutableConfirmationPack, existingReceipt, true), 1000)
@@ -538,6 +539,9 @@ const checkConfirmation = function(mutableConfirmationPack, existingReceipt, isP
         timeoutCount, // eslint-disable-line no-unused-vars
         result,
     } = mutableConfirmationPack
+    console.log(`existingReceipt in checkConfirmation: ${existingReceipt}`)
+    console.log(`result in checkocnfirmation means tx hash: ${result}`)
+    console.log(new Error().stack)
 
     if (err) {
         sub.unsubscribe()
@@ -667,6 +671,7 @@ const checkForContractDeployment = (mutableConfirmationPack, receipt, sub) => {
 const checkForNormalTx = (mutableConfirmationPack, receipt, sub) => {
     // eslint-disable-next-line no-unused-vars
     const { defer, canUnsubscribe, promiseResolved, gasProvided } = mutableConfirmationPack
+    console.log(`canUnsubscribe in checkForNormalTx: ${canUnsubscribe}`)
 
     if (
         receipt &&

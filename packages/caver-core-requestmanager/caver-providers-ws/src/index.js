@@ -86,6 +86,8 @@ const WebsocketProvider = function WebsocketProvider(url, options) {
         const data = typeof e.data === 'string' ? e.data : ''
 
         _this._parseResponse(data).forEach(function(result) {
+            console.log(`result in onmessage`)
+            console.log(result)
             let id = null
 
             // get the id which matches the returned id
