@@ -43,6 +43,7 @@ const { version } = require('./package.json')
 
 function Caver(provider, net) {
     const _this = this
+    console.log(_this)
 
     this.use = middleware.registerMiddleware.bind(middleware)
     // sets _requestmanager etc
