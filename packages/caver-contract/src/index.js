@@ -147,6 +147,8 @@ const Contract = function Contract(jsonInterface, address, options) {
                 } else if (method.type === 'event') {
                     method.signature = abi.encodeEventSignature(funcName)
                     const event = _this._on.bind(_this, method.signature)
+                    event.once = _this.once.bind(_this, method.name)
+                    event.getPastEvents = _this.getPastEvents.bind(_this, method.name)
 
                     // add method only if not already exists
                     if (!_this.events[method.name] || _this.events[method.name].name === 'bound ') {
